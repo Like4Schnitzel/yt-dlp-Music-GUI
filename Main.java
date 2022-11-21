@@ -668,7 +668,7 @@ public class Main {
                         String s;
                         for (int i = Integer.parseInt(playlistStart.getText()); (s = stdInput.readLine()) != null; i++) {
                             downloadProgress.setValue(i*1000);
-                            downloadProgress.setString("Downloading video " + (i - Integer.parseInt(playlistStart.getText() + 1)) + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
+                            downloadProgress.setString("Downloading video " + (i - Integer.parseInt(playlistStart.getText()) + 1) + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
                             downloader[2] = Integer.toString(i);
                             downloader[4] = Integer.toString(i);
                             if (s.equals("NA")) {
