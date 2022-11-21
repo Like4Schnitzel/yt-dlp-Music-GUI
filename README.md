@@ -14,7 +14,7 @@ Current features are:
 + Automatically switching to video title if there is no track name available
 + Automatically switching to playlist name if there is no album available
 + Automatically switching to channel name if there is no artist available
++ A progress bar for the download
 
 Planned features:
 + Setting the main output directory (currently downloads to the user's music directory)
-+ A progress bar for the download
