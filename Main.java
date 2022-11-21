@@ -20,6 +20,30 @@ public class Main {
     private static String playlist;
     private static LocalTime time = LocalTime.now();
     private static boolean waiting = false;
+    private static JFrame frame = new JFrame();
+    private static JPanel panel = new JPanel();
+    private static JLabel linkLabel;
+    private static JLabel artistLabel;
+    private static JLabel albumLabel;
+    private static JLabel titleLabel;
+    private static JLabel playlistLabel;
+    private static JLabel playlistTo;
+    private static JRadioButton defaultArtist;
+    private static JRadioButton customArtist;
+    private static ButtonGroup selectArtist;
+    private static JRadioButton defaultAlbum;
+    private static JRadioButton singleAlbum;
+    private static JRadioButton customAlbum;
+    private static ButtonGroup selectAlbum;
+    private static JRadioButton defaultTitle;
+    private static JRadioButton customTitle;
+    private static ButtonGroup selectTitle;
+    private static JRadioButton yesPlaylist;
+    private static JRadioButton noPlaylist;
+    private static JRadioButton customPlaylist;
+    private static ButtonGroup downloadPlaylist;
+    private static JButton download;
+    private static JProgressBar downloadProgress;
     private static JTextField linkText;
     private static JTextField artistText;
     private static JTextField albumText;
@@ -77,6 +101,34 @@ public class Main {
         return output;
     }
 
+    public static void disableAll() {
+        artistLabel.setEnabled(false);
+        artistText.setEnabled(false);
+        defaultArtist.setEnabled(false);
+        customArtist.setEnabled(false);
+
+        albumLabel.setEnabled(false);
+        albumText.setEnabled(false);
+        defaultAlbum.setEnabled(false);
+        singleAlbum.setEnabled(false);
+        customAlbum.setEnabled(false);
+
+        titleLabel.setEnabled(false);
+        titleText.setEnabled(false);
+        defaultTitle.setEnabled(false);
+        customTitle.setEnabled(false);
+
+        playlistLabel.setEnabled(false);
+        yesPlaylist.setEnabled(false);
+        noPlaylist.setEnabled(false);
+        customPlaylist.setEnabled(false);
+        playlistStart.setEnabled(false);
+        playlistTo.setEnabled(false);
+        playlistEnd.setEnabled(false);
+
+        download.setEnabled(false);
+    }
+
     public static void main(String[] args) {
 
         //check if an internet connection is established
@@ -84,8 +136,8 @@ public class Main {
             InetAddress.getByName("www.youtube.com").isReachable(3);
         } catch (IOException error) {
             //error message if there is no internet connection
-            JFrame frame = new JFrame();
-            JPanel panel = new JPanel();
+            frame = new JFrame();
+            panel = new JPanel();
             JLabel message = new JLabel("Please establish an internet connection.");
             JButton confirm = new JButton("Ok");
 
@@ -116,35 +168,36 @@ public class Main {
         int frameWidth = 500;
         int frameHeight = 300;
 
-        JFrame frame = new JFrame();
-        JPanel panel = new JPanel();
-        JLabel linkLabel = new JLabel("Link: ");
-        JLabel artistLabel = new JLabel("Artist name: ");
-        JLabel albumLabel = new JLabel("Album name: ");
-        JLabel titleLabel = new JLabel("Title name: ");
-        JLabel playlistLabel = new JLabel("Download playlist?");
-        JLabel playlistTo = new JLabel(" to");
+        frame = new JFrame();
+        panel = new JPanel();
+        linkLabel = new JLabel("Link: ");
+        artistLabel = new JLabel("Artist name: ");
+        albumLabel = new JLabel("Album name: ");
+        titleLabel = new JLabel("Title name: ");
+        playlistLabel = new JLabel("Download playlist?");
+        playlistTo = new JLabel(" to");
         linkText = new JTextField(20);
         artistText = new JTextField(20);
         albumText = new JTextField(20);
         titleText = new JTextField(20);
         playlistStart = new JTextField(3);
         playlistEnd = new JTextField(3);
-        JRadioButton defaultArtist = new JRadioButton("detect");
-        JRadioButton customArtist = new JRadioButton();
-        ButtonGroup selectArtist = new ButtonGroup();
-        JRadioButton defaultAlbum = new JRadioButton("detect");
-        JRadioButton singleAlbum = new JRadioButton("Single");
-        JRadioButton customAlbum = new JRadioButton();
-        ButtonGroup selectAlbum = new ButtonGroup();
-        JRadioButton defaultTitle = new JRadioButton("detect");
-        JRadioButton customTitle = new JRadioButton("detect");
-        ButtonGroup selectTitle = new ButtonGroup();
-        JRadioButton yesPlaylist = new JRadioButton("Yes");
-        JRadioButton noPlaylist = new JRadioButton("No");
-        JRadioButton customPlaylist = new JRadioButton("From index");
-        ButtonGroup downloadPlaylist = new ButtonGroup();
-        JButton download = new JButton("Download");
+        defaultArtist = new JRadioButton("detect");
+        customArtist = new JRadioButton();
+        selectArtist = new ButtonGroup();
+        defaultAlbum = new JRadioButton("detect");
+        singleAlbum = new JRadioButton("Single");
+        customAlbum = new JRadioButton();
+        selectAlbum = new ButtonGroup();
+        defaultTitle = new JRadioButton("detect");
+        customTitle = new JRadioButton("detect");
+        selectTitle = new ButtonGroup();
+        yesPlaylist = new JRadioButton("Yes");
+        noPlaylist = new JRadioButton("No");
+        customPlaylist = new JRadioButton("From index");
+        downloadPlaylist = new ButtonGroup();
+        download = new JButton("Download");
+        downloadProgress = new JProgressBar();
 
         frame.setSize(frameWidth, frameHeight);
         frame.setResizable(false);
@@ -173,34 +226,6 @@ public class Main {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 checkValidity();
-            }
-
-            public void disableAll() {
-                artistLabel.setEnabled(false);
-                artistText.setEnabled(false);
-                defaultArtist.setEnabled(false);
-                customArtist.setEnabled(false);
-
-                albumLabel.setEnabled(false);
-                albumText.setEnabled(false);
-                defaultAlbum.setEnabled(false);
-                singleAlbum.setEnabled(false);
-                customAlbum.setEnabled(false);
-
-                titleLabel.setEnabled(false);
-                titleText.setEnabled(false);
-                defaultTitle.setEnabled(false);
-                customTitle.setEnabled(false);
-
-                playlistLabel.setEnabled(false);
-                yesPlaylist.setEnabled(false);
-                noPlaylist.setEnabled(false);
-                customPlaylist.setEnabled(false);
-                playlistStart.setEnabled(false);
-                playlistTo.setEnabled(false);
-                playlistEnd.setEnabled(false);
-
-                download.setEnabled(false);
             }
 
             public void checkValidity() {
@@ -615,68 +640,133 @@ public class Main {
 
         download.setBounds(frameWidth/2 - 150/2, frameHeight - 100, 150, 25);
         download.addActionListener(e -> {
-            if (downloadAsPlaylist) {
-                Runtime downloadRuntime = Runtime.getRuntime();
-                String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", linkText.getText()};
-                String[] playlistTrackNames = {"yt-dlp", "--skip-download", "--print", "track", "--playlist-start", playlistStart.getText(), "--playlist-end", playlistEnd.getText(), linkText.getText(), ""};
-                try {
-                    Runtime nameRuntime = Runtime.getRuntime();
-                    Process getNames = nameRuntime.exec(playlistTrackNames);
-                    BufferedReader stdInput = new BufferedReader(new InputStreamReader(getNames.getInputStream()));
+            boolean albumDetectEnabled = defaultAlbum.isEnabled();
+            boolean customTitleEnabled = customTitle.isEnabled();
+            boolean playlistEnabled = playlistLabel.isEnabled();
 
-                    String s;
-                    for (int i = Integer.parseInt(playlistStart.getText()); (s = stdInput.readLine()) != null; i++) {
-                        downloader[2] = Integer.toString(i);
-                        downloader[4] = Integer.toString(i);
-                        if (s.equals("NA")) {
-                            //download with title
-                            if (singleAlbum.isSelected()) {
-                                downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(title)s/%(title)s.%(ext)s";
+            linkLabel.setEnabled(false);
+            linkText.setEnabled(false);
+            disableAll();
+
+            downloadProgress.setVisible(true);
+            downloadProgress.setString("Preparing download...");
+
+            new Thread ( () -> {
+                if (downloadAsPlaylist) {
+                    downloadProgress.setMinimum(Integer.parseInt(playlistStart.getText()) * 1000);
+                    downloadProgress.setMaximum(Integer.parseInt(playlistEnd.getText()) * 1000 + 1000);
+                    downloadProgress.setValue(downloadProgress.getMinimum());
+
+                    Runtime downloadRuntime = Runtime.getRuntime();
+                    String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", linkText.getText()};
+                    String[] playlistTrackNames = {"yt-dlp", "--skip-download", "--print", "track", "--playlist-start", playlistStart.getText(), "--playlist-end", playlistEnd.getText(), linkText.getText(), ""};
+                    try {
+                        Runtime nameRuntime = Runtime.getRuntime();
+                        Process getNames = nameRuntime.exec(playlistTrackNames);
+                        BufferedReader stdInput = new BufferedReader(new InputStreamReader(getNames.getInputStream()));
+
+                        String s;
+                        for (int i = Integer.parseInt(playlistStart.getText()); (s = stdInput.readLine()) != null; i++) {
+                            downloadProgress.setValue(i*1000);
+                            downloadProgress.setString("Downloading video " + (i - Integer.parseInt(playlistStart.getText() + 1)) + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
+                            downloader[2] = Integer.toString(i);
+                            downloader[4] = Integer.toString(i);
+                            if (s.equals("NA")) {
+                                //download with title
+                                if (singleAlbum.isSelected()) {
+                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(title)s/%(title)s.%(ext)s";
+                                } else {
+                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(title)s.%(ext)s";
+                                }
                             } else {
-                                downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(title)s.%(ext)s";
+                                //download with track
+                                if (singleAlbum.isSelected()) {
+                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(track)s/%(track)s.%(ext)s";
+                                } else {
+                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(track)s.%(ext)s";
+                                }
                             }
-                        } else {
-                            //download with track
-                            if (singleAlbum.isSelected()) {
-                                downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(track)s/%(track)s.%(ext)s";
-                            } else {
-                                downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(track)s.%(ext)s";
+
+                            try {
+                                Process downloading = downloadRuntime.exec(downloader);
+                                BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
+
+                                String s1;
+                                while ((s1 = stdInput1.readLine()) != null) {
+                                    if(s1.length() > 15 && s1.substring(0, 10).equals("[download]") && s1.charAt(16) == '%') {
+                                        downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + i * 1000);
+                                    }
+                                }
+                            } catch (IOException ex) {
+                                throw new RuntimeException(ex);
                             }
                         }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    downloadProgress.setMinimum(0);
+                    downloadProgress.setMaximum(1000);
+                    downloadProgress.setValue(0);
 
-                        try {
-                            Process downloading = downloadRuntime.exec(downloader);
-                            BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
+                    Runtime downloadRuntime = Runtime.getRuntime();
+                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + titleText.getText() + ".%(ext)s", linkText.getText()};
+                    try {
+                        Process proc = downloadRuntime.exec(downloader);
+                        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-                            String s1;
-                            while ((s1 = stdInput1.readLine()) != null) {
-                                System.out.println(s1);
+                        String s;
+                        while ((s = stdInput.readLine()) != null) {
+                            if(s.length() > 15 && s.substring(0, 10).equals("[download]") && s.charAt(16) == '%') {
+                                downloadProgress.setValue((int) (Double.parseDouble(s.substring(11, 16)) * 10));
+                                downloadProgress.setString("Downloading video at " + downloadProgress.getValue()/10. + "%...");
                             }
-                        } catch (IOException ex) {
-                            throw new RuntimeException(ex);
                         }
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
                     }
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
                 }
-            } else {
-                Runtime downloadRuntime = Runtime.getRuntime();
-                String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + titleText.getText() + ".%(ext)s", linkText.getText()};
-                try {
-                    Process proc = downloadRuntime.exec(downloader);
-                    BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 
-                    String s;
-                    while ((s = stdInput.readLine()) != null) {
-                        System.out.println(s);
+                downloadProgress.setValue(downloadProgress.getMaximum());
+                downloadProgress.setString("Finished downloading successfully!");
+
+                //re-enabling everything
+                linkLabel.setEnabled(true);
+                linkText.setEnabled(true);
+                artistLabel.setEnabled(true);
+                defaultArtist.setEnabled(true);
+                customArtist.setEnabled(true);
+                artistText.setEnabled(customArtist.isSelected());
+                albumLabel.setEnabled(true);
+                defaultAlbum.setEnabled(albumDetectEnabled);
+                singleAlbum.setEnabled(true);
+                customAlbum.setEnabled(true);
+                albumText.setEnabled(customAlbum.isSelected());
+                titleLabel.setEnabled(true);
+                defaultTitle.setEnabled(true);
+                customTitle.setEnabled(customTitleEnabled);
+                titleText.setEnabled(customTitle.isSelected());
+                if (playlistEnabled) {
+                    playlistLabel.setEnabled(true);
+                    yesPlaylist.setEnabled(true);
+                    noPlaylist.setEnabled(true);
+                    customPlaylist.setEnabled(true);
+                    if (customPlaylist.isSelected()) {
+                        playlistStart.setEnabled(true);
+                        playlistTo.setEnabled(true);
+                        playlistEnd.setEnabled(true);
                     }
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
                 }
-            }
+                download.setEnabled(true);
+            }).start();
         });
         download.setEnabled(false);
         panel.add(download);
+
+        downloadProgress.setBounds(50, download.getY() + download.getHeight() + 10, frameWidth - 2*50, 25);
+        downloadProgress.setVisible(false);
+        downloadProgress.setStringPainted(true);
+        panel.add(downloadProgress);
 
         frame.setVisible(true);
     }
