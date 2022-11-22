@@ -658,47 +658,67 @@ public class Main {
                     downloadProgress.setValue(downloadProgress.getMinimum());
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", linkText.getText()};
-                    String[] playlistTrackNames = {"yt-dlp", "--skip-download", "--print", "track", "--playlist-start", playlistStart.getText(), "--playlist-end", playlistEnd.getText(), linkText.getText(), ""};
+                    String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", "--ppa", "set later [13]", linkText.getText()};
+                    String[] playlistTrackNames = {"yt-dlp", "--skip-download", "--print", "title", "--print", "track", "--playlist-start", playlistStart.getText(), "--playlist-end", playlistEnd.getText(), linkText.getText()};
                     try {
                         Runtime nameRuntime = Runtime.getRuntime();
                         Process getNames = nameRuntime.exec(playlistTrackNames);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(getNames.getInputStream()));
 
                         String s;
-                        for (int i = Integer.parseInt(playlistStart.getText()); (s = stdInput.readLine()) != null; i++) {
-                            downloadProgress.setValue(i*1000);
-                            downloadProgress.setString("Downloading video " + (i - Integer.parseInt(playlistStart.getText()) + 1) + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
-                            downloader[2] = Integer.toString(i);
-                            downloader[4] = Integer.toString(i);
-                            if (s.equals("NA")) {
-                                //download with title
-                                if (singleAlbum.isSelected()) {
-                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(title)s/%(title)s.%(ext)s";
-                                } else {
-                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(title)s.%(ext)s";
-                                }
+                        String currentAlbum = "";
+                        String currentTitle = "";
+                        for (int i = 0; (s = stdInput.readLine()) != null; i++) {
+                            if (i % 2 == 0) {
+                                currentTitle = s;
                             } else {
-                                //download with track
                                 if (singleAlbum.isSelected()) {
-                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/%(track)s/%(track)s.%(ext)s";
+                                    currentAlbum = currentTitle;
                                 } else {
-                                    downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/%(track)s.%(ext)s";
+                                    currentAlbum = albumText.getText();
                                 }
-                            }
 
-                            try {
-                                Process downloading = downloadRuntime.exec(downloader);
-                                BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
-
-                                String s1;
-                                while ((s1 = stdInput1.readLine()) != null) {
-                                    if(s1.length() > 15 && s1.substring(0, 10).equals("[download]") && s1.charAt(16) == '%') {
-                                        downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + i * 1000);
+                                i = i / 2 + 1;
+                                System.out.println("i=" + i + " min=" + downloadProgress.getMinimum() + " max=" + downloadProgress.getMaximum());
+                                downloadProgress.setValue((i + Integer.parseInt(playlistStart.getText()) - 1) * 1000);
+                                downloadProgress.setString("Preparing download for video " + i + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
+                                downloader[2] = Integer.toString(i + Integer.parseInt(playlistStart.getText()) - 1);
+                                downloader[4] = downloader[2];
+                                if (s.equals("NA")) {
+                                    //download with title
+                                    if (singleAlbum.isSelected()) {
+                                        downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + currentTitle + "/" + currentTitle + ".%(ext)s";
+                                    } else {
+                                        downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + currentTitle + ".%(ext)s";
                                     }
+                                } else {
+                                    //download with track
+                                    if (singleAlbum.isSelected()) {
+                                        downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + s + "/" + s + ".%(ext)s";
+                                    } else {
+                                        downloader[11] = System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + s + ".%(ext)s";
+                                    }
+                                    currentTitle = s;
                                 }
-                            } catch (IOException ex) {
-                                throw new RuntimeException(ex);
+                                downloader[13] = "-metadata artist='" + artistText.getText() + "' -metadata album='" + currentAlbum + "' -metadata title='" + currentTitle + "'";
+
+                                try {
+                                    System.out.println(Arrays.toString(downloader));
+                                    Process downloading = downloadRuntime.exec(downloader);
+                                    BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
+
+                                    String s1;
+                                    while ((s1 = stdInput1.readLine()) != null) {
+                                        if (s1.length() > 15 && s1.substring(0, 10).equals("[download]") && s1.charAt(16) == '%') {
+                                            downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + (i + Integer.parseInt(playlistStart.getText()) - 1) * 1000);
+                                            downloadProgress.setString("Downloading video " + i + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
+                                        }
+                                    }
+                                } catch (IOException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+
+                                i = i * 2 - 1;
                             }
                         }
                     } catch (IOException ex) {
@@ -710,7 +730,7 @@ public class Main {
                     downloadProgress.setValue(0);
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + titleText.getText() + ".%(ext)s", linkText.getText()};
+                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", System.getProperty("user.home") + "/Music/" + artistText.getText() + "/" + albumText.getText() + "/" + titleText.getText() + ".%(ext)s", "--ppa", "-metadata artist='" + artistText.getText() + "' -metadata album='" + albumText.getText() + "' -metadata title='" + titleText.getText() + "'", linkText.getText()};
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
