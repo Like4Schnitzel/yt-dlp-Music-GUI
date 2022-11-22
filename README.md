@@ -1,4 +1,4 @@
-# For this to run you need to have yt-dlp installed. You can check how to do so here: https://github.com/yt-dlp/yt-dlp#installation
+# For this to run you need to have Java 11 or higher and yt-dlp installed. You can check how to do so [**here**](https://github.com/yt-dlp/yt-dlp#installation).
 
 ### simple-GUI-for-yt-dlp
 A simple cross platform GUI for downloading songs from YouTube with [yt-dlp](https://github.com/yt-dlp/yt-dlp).
