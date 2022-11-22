@@ -7,6 +7,7 @@ The goal of this project was to stop having to think about which arguments to pa
 Current features are:
 + Automatic detection for artist name, album name and title/track name
 + Manually setting artist name, album name and title/track name
++ Automatic metadata embedding
 + Downloading playlists
 + Partially downloading playlists from one index to the other
 + Only downloading the given song from a playlist
