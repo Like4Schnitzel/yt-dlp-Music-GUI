@@ -3,7 +3,7 @@
 + [**yt-dlp**](https://github.com/yt-dlp/yt-dlp#installation)
 + [**ffmpeg**](https://ffmpeg.org/download.html)
 
-### simple-GUI-for-yt-dlp
+## simple-GUI-for-yt-dlp
 A simple cross platform GUI for downloading songs from YouTube with [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 The goal of this project was to stop having to think about which arguments to pass every time you want to download a song.
 
