@@ -1,4 +1,7 @@
-# For this to run you need to have Java 11 or higher and yt-dlp installed. You can check how to do so [**here**](https://github.com/yt-dlp/yt-dlp#installation).
+## For this to run you need to have the following installed:
++ [**Java**](https://www.java.com/en/download/manual.jsp)
++ [**yt-dlp**](https://github.com/yt-dlp/yt-dlp#installation)
++ [**ffmpeg**](https://ffmpeg.org/download.html)
 
 ### simple-GUI-for-yt-dlp
 A simple cross platform GUI for downloading songs from YouTube with [yt-dlp](https://github.com/yt-dlp/yt-dlp).
@@ -19,3 +22,4 @@ Current features are:
 
 Planned features:
 + Setting the main output directory (currently downloads to the user's music directory)
++ Automatic installer for yt-dlp and ffmpeg
