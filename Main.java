@@ -1,6 +1,8 @@
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.*;
@@ -28,6 +30,7 @@ public class Main {
     private static JLabel titleLabel;
     private static JLabel playlistLabel;
     private static JLabel playlistTo;
+    private static JLabel errorMessage;
     private static JRadioButton defaultArtist;
     private static JRadioButton customArtist;
     private static ButtonGroup selectArtist;
@@ -43,6 +46,7 @@ public class Main {
     private static JRadioButton customPlaylist;
     private static ButtonGroup downloadPlaylist;
     private static JButton download;
+    private static JButton close;
     private static JProgressBar downloadProgress;
     private static JTextField linkText;
     private static JTextField artistText;
@@ -101,6 +105,36 @@ public class Main {
         return output;
     }
 
+    public static boolean ffmpegInstalled() {
+        Runtime rt = Runtime.getRuntime();
+        String[] command = {"ffmpeg", "-version"};
+        try {
+            rt.exec(command);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static boolean ytdlpInstalled() {
+        Runtime rt = Runtime.getRuntime();
+        String[] command = {"yt-dlp", "--version"};
+        try {
+            Process run = rt.exec(command);
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(run.getInputStream()));
+            String s = stdInput.readLine();
+            Integer.parseInt(s.substring(0, 4));
+            Integer.parseInt(s.substring(5, 7));
+            Integer.parseInt(s.substring(8, 10));
+            if (!(s.charAt(4) == '.' && s.charAt(7) == '.')) {
+                throw new IOException();
+            }
+            return true;
+        } catch (IOException | NullPointerException | NumberFormatException e) {
+            return false;
+        }
+    }
+
     public static void disableAll() {
         artistLabel.setEnabled(false);
         artistText.setEnabled(false);
@@ -129,35 +163,50 @@ public class Main {
         download.setEnabled(false);
     }
 
-    public static void main(String[] args) {
+    public static void initErrorMessage(String errorText) {
+        frame.setSize(300, 120);
+        frame.setLocationRelativeTo(null);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setTitle("Youtube Music Downloader");
 
+        panel.setLayout(null);
+        frame.add(panel);
+
+        errorMessage = new JLabel(errorText);
+        close = new JButton("Close");
+
+        errorMessage.setBounds(0, 20, 300, 20);
+        errorMessage.setHorizontalAlignment(JLabel.CENTER);
+        panel.add(errorMessage);
+
+        close.setBounds(110, 50, 80, 30);
+        close.addActionListener(e -> frame.dispose());
+        panel.add(close);
+
+        frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        frame = new JFrame();
+        panel = new JPanel();
+        frame.setResizable(false);
         //check if an internet connection is established
         try {
             InetAddress.getByName("www.youtube.com").isReachable(3);
         } catch (IOException error) {
             //error message if there is no internet connection
-            frame = new JFrame();
-            panel = new JPanel();
-            JLabel message = new JLabel("Please establish an internet connection.");
-            JButton confirm = new JButton("Ok");
+            initErrorMessage("Please establish an internet connection.");
+            close.setText("Ok");
+            return;
+        }
 
-            frame.setSize(300, 120);
-            frame.setResizable(false);
-            frame.setLocationRelativeTo(null);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setTitle("Youtube Music Downloader");
+        if (!ffmpegInstalled()) {
+            initErrorMessage("ffmpeg could not be found");
+            return;
+        }
 
-            panel.setLayout(null);
-            frame.add(panel);
-
-            message.setBounds(5, 20, 290, 20);
-            panel.add(message);
-
-            confirm.setBounds(120, 50, 60, 30);
-            confirm.addActionListener(e -> frame.dispose());
-            panel.add(confirm);
-
-            frame.setVisible(true);
+        if (!ytdlpInstalled()) {
+            initErrorMessage("yt-dlp could not be found.");
             return;
         }
 
@@ -168,20 +217,18 @@ public class Main {
         int frameWidth = 500;
         int frameHeight = 300;
 
-        frame = new JFrame();
-        panel = new JPanel();
         linkLabel = new JLabel("Link: ");
         artistLabel = new JLabel("Artist name: ");
         albumLabel = new JLabel("Album name: ");
         titleLabel = new JLabel("Title name: ");
         playlistLabel = new JLabel("Download playlist?");
         playlistTo = new JLabel(" to");
-        linkText = new JTextField(20);
-        artistText = new JTextField(20);
-        albumText = new JTextField(20);
-        titleText = new JTextField(20);
-        playlistStart = new JTextField(3);
-        playlistEnd = new JTextField(3);
+        linkText = new JTextField();
+        artistText = new JTextField();
+        albumText = new JTextField();
+        titleText = new JTextField();
+        playlistStart = new JTextField();
+        playlistEnd = new JTextField();
         defaultArtist = new JRadioButton("detect");
         customArtist = new JRadioButton();
         selectArtist = new ButtonGroup();
@@ -200,7 +247,6 @@ public class Main {
         downloadProgress = new JProgressBar();
 
         frame.setSize(frameWidth, frameHeight);
-        frame.setResizable(false);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setTitle("Youtube Music Downloader");
@@ -239,7 +285,13 @@ public class Main {
 
                     if (Duration.between(time, LocalTime.now()).getSeconds() < checkDelaySeconds){
                         waiting = true;
-                        while(Duration.between(time, LocalTime.now()).getSeconds() < checkDelaySeconds);
+                        while(Duration.between(time, LocalTime.now()).getSeconds() < checkDelaySeconds) {
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
                     }
 
                     linkText.setEnabled(false);
@@ -679,7 +731,6 @@ public class Main {
                                 }
 
                                 i = i / 2 + 1;
-                                System.out.println("i=" + i + " min=" + downloadProgress.getMinimum() + " max=" + downloadProgress.getMaximum());
                                 downloadProgress.setValue((i + Integer.parseInt(playlistStart.getText()) - 1) * 1000);
                                 downloadProgress.setString("Preparing download for video " + i + " of " + (Integer.parseInt(playlistEnd.getText()) - Integer.parseInt(playlistStart.getText()) + 1) + "...");
                                 downloader[2] = Integer.toString(i + Integer.parseInt(playlistStart.getText()) - 1);
@@ -703,7 +754,6 @@ public class Main {
                                 downloader[13] = "-metadata artist='" + artistText.getText() + "' -metadata album='" + currentAlbum + "' -metadata title='" + currentTitle + "'";
 
                                 try {
-                                    System.out.println(Arrays.toString(downloader));
                                     Process downloading = downloadRuntime.exec(downloader);
                                     BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
 
