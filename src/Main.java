@@ -113,7 +113,6 @@ public class Main {
                     returnString = returnString.substring(0, i) + '\\' + checkChars[j] + returnString.substring(i + 1, length);
                     length++;
                     i++;
-                    System.out.println(returnString);
                     break;
                 }
             }
@@ -522,11 +521,6 @@ public class Main {
             mainWindow.downloadProgress.setString("Preparing download...");
 
             new Thread ( () -> {
-                String useAsArtist = formatForPPA(mainWindow.artistText.getText());
-                String useAsAlbum = formatForPPA(mainWindow.albumText.getText());
-                String useAsTitle = formatForPPA(mainWindow.titleText.getText());
-                System.out.println(useAsTitle);
-
                 if (downloadAsPlaylist) {
                     mainWindow.downloadProgress.setMinimum(parseInt(mainWindow.playlistStart.getText()) * 1000);
                     mainWindow.downloadProgress.setMaximum(parseInt(mainWindow.playlistEnd.getText()) * 1000 + 1000);
@@ -545,12 +539,12 @@ public class Main {
                         String currentTitle = "";
                         for (int i = 0; (s = stdInput.readLine()) != null; i++) {
                             if (i % 2 == 0) {
-                                currentTitle = s;
+                                currentTitle = s.replace("/", "_");
                             } else {
                                 if (mainWindow.singleAlbum.isSelected()) {
                                     currentAlbum = currentTitle;
                                 } else {
-                                    currentAlbum = useAsAlbum;
+                                    currentAlbum = mainWindow.albumText.getText();
                                 }
 
                                 i = i / 2 + 1;
@@ -561,20 +555,21 @@ public class Main {
                                 if (s.equals("NA")) {
                                     //download with title
                                     if (mainWindow.singleAlbum.isSelected()) {
-                                        downloader[11] = outputDirectory + "/" + useAsArtist + "/" + currentTitle + "/" + currentTitle + ".%(ext)s";
+                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentTitle + "/" + currentTitle + ".%(ext)s";
                                     } else {
-                                        downloader[11] = outputDirectory + "/" + useAsArtist + "/" + useAsAlbum + "/" + currentTitle + ".%(ext)s";
+                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentAlbum + "/" + currentTitle + ".%(ext)s";
                                     }
                                 } else {
                                     //download with track
+                                    s = s.replace('/', '_');
                                     if (mainWindow.singleAlbum.isSelected()) {
-                                        downloader[11] = outputDirectory + "/" + useAsArtist + "/" + s + "/" + s + ".%(ext)s";
+                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + s + "/" + s + ".%(ext)s";
                                     } else {
-                                        downloader[11] = outputDirectory + "/" + useAsArtist + "/" + useAsAlbum + "/" + s + ".%(ext)s";
+                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentAlbum + "/" + s + ".%(ext)s";
                                     }
                                     currentTitle = s;
                                 }
-                                downloader[13] = "-metadata artist='" + useAsArtist + "' -metadata album='" + currentAlbum + "' -metadata title='" + currentTitle + "'";
+                                downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
 
                                 try {
                                     Process downloading = downloadRuntime.exec(downloader);
@@ -582,7 +577,7 @@ public class Main {
 
                                     String s1;
                                     while ((s1 = stdInput1.readLine()) != null) {
-                                        if (s1.length() > 15 && s1.substring(0, 10).equals("[download]") && s1.charAt(16) == '%') {
+                                        if (s1.length() > 15 && s1.startsWith("[download]") && s1.charAt(16) == '%') {
                                             mainWindow.downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + (i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
                                             mainWindow.downloadProgress.setString("Downloading video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
                                         }
@@ -598,29 +593,25 @@ public class Main {
                         throw new RuntimeException(ex);
                     }
                 } else {
+                    String useAsArtist = formatForPPA(mainWindow.artistText.getText());
+                    String useAsAlbum = formatForPPA(mainWindow.albumText.getText());
+                    String useAsTitle = formatForPPA(mainWindow.titleText.getText()).replace('/', '_');
                     mainWindow.downloadProgress.setMinimum(0);
                     mainWindow.downloadProgress.setMaximum(1000);
                     mainWindow.downloadProgress.setValue(0);
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + mainWindow.artistText.getText() + "/" + mainWindow.albumText.getText() + "/" + mainWindow.titleText.getText() + ".%(ext)s", "--ppa", "-metadata artist=" + useAsArtist + " -metadata album=" + useAsAlbum + " -metadata title=" + useAsTitle, mainWindow.linkText.getText()};
-                    System.out.println(Arrays.toString(downloader));
+                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + mainWindow.artistText.getText() + "/" + mainWindow.albumText.getText() + "/" + mainWindow.titleText.getText().replace('/', '_') + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + useAsArtist + " -metadata album=" + useAsAlbum + " -metadata title=" + useAsTitle, mainWindow.linkText.getText()};
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-                        BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 
                         String s;
                         while ((s = stdInput.readLine()) != null) {
-                            System.out.println(s);
-                            if(s.length() > 15 && s.substring(0, 10).equals("[download]") && s.charAt(16) == '%') {
+                            if(s.length() > 15 && s.startsWith("[download]") && s.charAt(16) == '%') {
                                 mainWindow.downloadProgress.setValue((int) (Double.parseDouble(s.substring(11, 16)) * 10));
                                 mainWindow.downloadProgress.setString("Downloading video at " + mainWindow.downloadProgress.getValue()/10. + "%...");
                             }
-                        }
-
-                        while ((s = stdError.readLine()) != null) {
-                            System.out.println(s);
                         }
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
