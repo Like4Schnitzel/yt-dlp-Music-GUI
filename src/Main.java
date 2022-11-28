@@ -535,11 +535,12 @@ public class Main {
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(getNames.getInputStream()));
 
                         String s;
+                        String currentArtist = mainWindow.artistText.getText();
                         String currentAlbum;
                         String currentTitle = "";
                         for (int i = 0; (s = stdInput.readLine()) != null; i++) {
                             if (i % 2 == 0) {
-                                currentTitle = s.replace("/", "_");
+                                currentTitle = s;
                             } else {
                                 if (mainWindow.singleAlbum.isSelected()) {
                                     currentAlbum = currentTitle;
@@ -552,24 +553,19 @@ public class Main {
                                 mainWindow.downloadProgress.setString("Preparing download for video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
                                 downloader[2] = Integer.toString(i + parseInt(mainWindow.playlistStart.getText()) - 1);
                                 downloader[4] = downloader[2];
-                                if (s.equals("NA")) {
-                                    //download with title
-                                    if (mainWindow.singleAlbum.isSelected()) {
-                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentTitle + "/" + currentTitle + ".%(ext)s";
-                                    } else {
-                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentAlbum + "/" + currentTitle + ".%(ext)s";
-                                    }
-                                } else {
+                                if (!s.equals("NA")) {
                                     //download with track
-                                    s = s.replace('/', '_');
-                                    if (mainWindow.singleAlbum.isSelected()) {
-                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + s + "/" + s + ".%(ext)s";
-                                    } else {
-                                        downloader[11] = outputDirectory + "/" + mainWindow.artistText.getText() + "/" + currentAlbum + "/" + s + ".%(ext)s";
-                                    }
                                     currentTitle = s;
+                                    if (mainWindow.singleAlbum.isSelected()) {
+                                        currentAlbum = s;
+                                    }
                                 }
-                                downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
+
+                                currentArtist = currentArtist.replace('/', '_');
+                                currentAlbum = currentAlbum.replace('/', '_');
+                                currentTitle = currentTitle.replace('/', '_');
+                                downloader[11] = outputDirectory + "/" + currentArtist + "/" + currentAlbum + "/" + currentTitle + ".%(ext)s";
+                                downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
 
                                 try {
                                     Process downloading = downloadRuntime.exec(downloader);
@@ -593,15 +589,15 @@ public class Main {
                         throw new RuntimeException(ex);
                     }
                 } else {
-                    String useAsArtist = formatForPPA(mainWindow.artistText.getText());
-                    String useAsAlbum = formatForPPA(mainWindow.albumText.getText());
-                    String useAsTitle = formatForPPA(mainWindow.titleText.getText()).replace('/', '_');
+                    String useAsArtist = formatForPPA(mainWindow.artistText.getText().replace('/', '_'));
+                    String useAsAlbum = formatForPPA(mainWindow.albumText.getText().replace('/', '_'));
+                    String useAsTitle = formatForPPA(mainWindow.titleText.getText().replace('/', '_'));
                     mainWindow.downloadProgress.setMinimum(0);
                     mainWindow.downloadProgress.setMaximum(1000);
                     mainWindow.downloadProgress.setValue(0);
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + mainWindow.artistText.getText() + "/" + mainWindow.albumText.getText() + "/" + mainWindow.titleText.getText().replace('/', '_') + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + useAsArtist + " -metadata album=" + useAsAlbum + " -metadata title=" + useAsTitle, mainWindow.linkText.getText()};
+                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + mainWindow.artistText.getText().replace('/', '_') + "/" + mainWindow.albumText.getText().replace('/', '_') + "/" + mainWindow.titleText.getText().replace('/', '_') + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + useAsArtist + " -metadata album=" + useAsAlbum + " -metadata title=" + useAsTitle, mainWindow.linkText.getText()};
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
