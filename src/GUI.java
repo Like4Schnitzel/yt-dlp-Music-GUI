@@ -3,15 +3,14 @@ import java.io.File;
 import java.time.LocalTime;
 
 public class GUI {
-    JFrame frame = new JFrame();
-    JPanel panel = new JPanel();
+    JFrame frame;
+    JPanel panel;
     JLabel linkLabel;
     JLabel artistLabel;
     JLabel albumLabel;
     JLabel titleLabel;
     JLabel playlistLabel;
     JLabel playlistTo;
-    JLabel errorMessage;
     JRadioButton defaultArtist;
     JRadioButton customArtist;
     ButtonGroup selectArtist;
@@ -27,7 +26,6 @@ public class GUI {
     JRadioButton customPlaylist;
     ButtonGroup downloadPlaylist;
     JButton download;
-    JButton close;
     JProgressBar downloadProgress;
     JTextField linkText;
     JTextField artistText;
