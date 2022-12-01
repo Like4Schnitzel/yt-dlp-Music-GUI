@@ -1,5 +1,4 @@
 ## For this to run you need to have the following installed:
-+ [**Java**](https://www.java.com/en/download/manual.jsp)
 + [**yt-dlp**](https://github.com/yt-dlp/yt-dlp#installation)
 + [**ffmpeg**](https://ffmpeg.org/download.html)
 
@@ -19,7 +18,7 @@ Current features are:
 + Automatically switching to playlist name if there is no album available
 + Automatically switching to channel name if there is no artist available
 + A progress bar for the download of both videos and playlists
++ Setting the main download directory (defaults to the user's Music directory)
 
 Planned features:
-+ Setting the main output directory (currently downloads to the user's music directory)
-+ Automatic installer for yt-dlp and ffmpeg
++ Packaging yt-dlp and ffmpeg
