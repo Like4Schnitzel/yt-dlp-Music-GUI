@@ -167,17 +167,17 @@ public class Loader {
 
             @Override
             public void focusLost(FocusEvent e) {
+                mainWindow.download.setEnabled(true);
+
                 try {
                     if (Integer.parseInt(mainWindow.playlistStart.getText()) < 1) {
                         mainWindow.playlistStart.setText("1");
                     } else if (Integer.parseInt(mainWindow.playlistStart.getText()) > Integer.parseInt(mainWindow.playlistEnd.getText())) {
-                        mainWindow.playlistStart.setText(mainWindow.playlistEnd.getText());
+                        mainWindow.download.setEnabled(false);
                     }
                 } catch (NumberFormatException ex) {
                     mainWindow.playlistStart.setText("1");
                 }
-
-                mainWindow.download.setEnabled(true);
             }
         });
         mainWindow.playlistStart.getDocument().addDocumentListener(new DocumentListener() {
@@ -222,17 +222,17 @@ public class Loader {
 
             @Override
             public void focusLost(FocusEvent e) {
+                mainWindow.download.setEnabled(true);
+
                 try {
                     if (Integer.parseInt(mainWindow.playlistEnd.getText()) > playlistCount) {
-                        mainWindow.playlistStart.setText(Integer.toString(playlistCount));
+                        mainWindow.playlistEnd.setText(Integer.toString(playlistCount));
                     } else if (Integer.parseInt(mainWindow.playlistStart.getText()) > Integer.parseInt(mainWindow.playlistEnd.getText())) {
-                        mainWindow.playlistEnd.setText(mainWindow.playlistStart.getText());
+                        mainWindow.download.setEnabled(false);
                     }
                 } catch (NumberFormatException ex) {
-                    mainWindow.playlistStart.setText(Integer.toString(playlistCount));
+                    mainWindow.playlistEnd.setText(Integer.toString(playlistCount));
                 }
-
-                mainWindow.download.setEnabled(true);
             }
         });
         mainWindow.playlistEnd.getDocument().addDocumentListener(new DocumentListener() {
@@ -309,7 +309,7 @@ public class Loader {
                     mainWindow.downloadProgress.setValue(mainWindow.downloadProgress.getMinimum());
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", "--ppa", "set later [13]", mainWindow.linkText.getText()};
+                    String[] downloader = {"yt-dlp", "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", "--ppa", "set later [13]", "--no-mtime", mainWindow.linkText.getText()};
                     String[] playlistTrackNames = {"yt-dlp", "--skip-download", "--print", "title", "--print", "track", "--playlist-start", mainWindow.playlistStart.getText(), "--playlist-end", mainWindow.playlistEnd.getText(), mainWindow.linkText.getText()};
                     try {
                         Runtime nameRuntime = Runtime.getRuntime();
@@ -343,10 +343,7 @@ public class Loader {
                                     }
                                 }
 
-                                currentArtist = currentArtist.replace('/', '_');
-                                currentAlbum = currentAlbum.replace('/', '_');
-                                currentTitle = currentTitle.replace('/', '_');
-                                downloader[11] = outputDirectory + "/" + currentArtist + "/" + currentAlbum + "/" + currentTitle + ".%(ext)s";
+                                downloader[11] = outputDirectory + "/" + formatForFilename(currentArtist) + "/" + formatForFilename(currentAlbum) + "/" + formatForFilename(currentTitle) + ".%(ext)s";
                                 downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
 
                                 try {
@@ -371,15 +368,12 @@ public class Loader {
                         throw new RuntimeException(ex);
                     }
                 } else {
-                    String useAsArtist = formatForPPA(mainWindow.artistText.getText().replace('/', '_'));
-                    String useAsAlbum = formatForPPA(mainWindow.albumText.getText().replace('/', '_'));
-                    String useAsTitle = formatForPPA(mainWindow.titleText.getText().replace('/', '_'));
                     mainWindow.downloadProgress.setMinimum(0);
                     mainWindow.downloadProgress.setMaximum(1000);
                     mainWindow.downloadProgress.setValue(0);
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + mainWindow.artistText.getText().replace('/', '_') + "/" + mainWindow.albumText.getText().replace('/', '_') + "/" + mainWindow.titleText.getText().replace('/', '_') + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + useAsArtist + " -metadata album=" + useAsAlbum + " -metadata title=" + useAsTitle, mainWindow.linkText.getText()};
+                    String[] downloader = {"yt-dlp", "--no-playlist", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(mainWindow.albumText.getText()) + " -metadata title=" + formatForPPA(mainWindow.titleText.getText()), "--no-mtime", mainWindow.linkText.getText()};
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -615,5 +609,31 @@ public class Loader {
         }
 
         return returnString;
+    }
+
+    public String formatForFilename(String str) {
+        //characters to replace with underscores
+        char[] checkChars = {':', '/', '?'};
+        String returnString = "";
+
+        for (int i = 0; i < str.length(); i++) {
+            if (charArrayContainsChar(checkChars, str.charAt(i))) {
+                returnString += '_';
+            } else {
+                returnString += str.charAt(i);
+            }
+        }
+
+        return returnString;
+    }
+
+    private boolean charArrayContainsChar(char[] arr, char c) {
+        for (int i = 0; i < arr.length; i++) {
+            if (c == arr[i]) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
