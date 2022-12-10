@@ -19,6 +19,9 @@ Current features are:
 + Automatically switching to channel name if there is no artist available
 + A progress bar for the download of both videos and playlists
 + Setting the main download directory (defaults to the user's Music directory)
++ Making the filenames fit with UNIX naming conventions while keeping the metadata unchanged (you can adjust which characters to replace in the function `formatForFileName(String str)` in `Loader.java`)
 
 Planned features:
-+ Packaging yt-dlp and ffmpeg
++ Packaging yt-dlp and ffmpeg with the .jar file
++ Downloading chapters
++ Downloading from a specified timestamp to another
