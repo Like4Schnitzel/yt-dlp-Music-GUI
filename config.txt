@@ -1,0 +1,10 @@
+ffmpeg-path=ffmpeg
+yt-dlp-path=yt-dlp
+
+delay-seconds=1
+
+frame-width=600
+frame-height=350
+left-bound=10
+upper-bound=20
+line-distance=25
