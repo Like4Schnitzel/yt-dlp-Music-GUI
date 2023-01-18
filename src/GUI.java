@@ -1,6 +1,4 @@
 import javax.swing.*;
-import java.io.File;
-import java.time.LocalTime;
 
 public class GUI {
     JFrame frame;
@@ -11,6 +9,8 @@ public class GUI {
     JLabel titleLabel;
     JLabel playlistLabel;
     JLabel playlistTo;
+    JLabel downloadSectionLabel;
+    JLabel downloadTo;
     JRadioButton defaultArtist;
     JRadioButton customArtist;
     ButtonGroup selectArtist;
@@ -25,6 +25,10 @@ public class GUI {
     JRadioButton noPlaylist;
     JRadioButton customPlaylist;
     ButtonGroup downloadPlaylist;
+    JRadioButton downloadFull;
+    JRadioButton downloadChapter;
+    JRadioButton downloadTimestamp;
+    ButtonGroup downloadSections;
     JButton download;
     JProgressBar downloadProgress;
     JTextField linkText;
@@ -33,39 +37,62 @@ public class GUI {
     JTextField titleText;
     JTextField playlistStart;
     JTextField playlistEnd;
+    JTextField downloadChapterField;
+    JTextField downloadStartStamp;
+    JTextField downloadEndStamp;
     JFileChooser outputDirectoryChooser;
     JButton outputDirectoryChooserButton;
     JTextField outputDirectoryTextField;
 
-    public void disableAll() {
-        artistLabel.setEnabled(false);
-        artistText.setEnabled(false);
-        defaultArtist.setEnabled(false);
-        customArtist.setEnabled(false);
+    public void setAllEnabled(boolean enabled) {
+        linkLabel.setEnabled(enabled);
+        linkText.setEnabled(enabled);
 
-        albumLabel.setEnabled(false);
-        albumText.setEnabled(false);
-        defaultAlbum.setEnabled(false);
-        singleAlbum.setEnabled(false);
-        customAlbum.setEnabled(false);
+        artistLabel.setEnabled(enabled);
+        artistText.setEnabled(enabled);
+        defaultArtist.setEnabled(enabled);
+        customArtist.setEnabled(enabled);
 
-        titleLabel.setEnabled(false);
-        titleText.setEnabled(false);
-        defaultTitle.setEnabled(false);
-        customTitle.setEnabled(false);
+        albumLabel.setEnabled(enabled);
+        albumText.setEnabled(enabled);
+        defaultAlbum.setEnabled(enabled);
+        singleAlbum.setEnabled(enabled);
+        customAlbum.setEnabled(enabled);
 
-        playlistLabel.setEnabled(false);
-        yesPlaylist.setEnabled(false);
-        noPlaylist.setEnabled(false);
-        customPlaylist.setEnabled(false);
-        playlistStart.setEnabled(false);
-        playlistTo.setEnabled(false);
-        playlistEnd.setEnabled(false);
+        titleLabel.setEnabled(enabled);
+        titleText.setEnabled(enabled);
+        defaultTitle.setEnabled(enabled);
+        customTitle.setEnabled(enabled);
 
-        download.setEnabled(false);
+        playlistLabel.setEnabled(enabled);
+        yesPlaylist.setEnabled(enabled);
+        noPlaylist.setEnabled(enabled);
+        customPlaylist.setEnabled(enabled);
+        playlistStart.setEnabled(enabled);
+        playlistTo.setEnabled(enabled);
+        playlistEnd.setEnabled(enabled);
+
+        downloadSectionLabel.setEnabled(enabled);
+        downloadFull.setEnabled(enabled);
+        downloadChapter.setEnabled(enabled);
+        downloadTimestamp.setEnabled(enabled);
+        downloadChapterField.setEnabled(enabled);
+        downloadStartStamp.setEnabled(enabled);
+        downloadTo.setEnabled(enabled);
+        downloadEndStamp.setEnabled(enabled);
+
+        outputDirectoryChooserButton.setEnabled(enabled);
+
+        download.setEnabled(enabled);
     }
 
-    public GUI(int frameWidth, int frameHeight, int leftBound, int upperBound, int lineDistance) {
+    public GUI(DependencyChecker checker) {
+        int frameWidth = Integer.parseInt(checker.configValues.get("frame-width"));
+        int frameHeight = Integer.parseInt(checker.configValues.get("frame-height"));
+        int leftBound = Integer.parseInt(checker.configValues.get("left-bound"));
+        int upperBound = Integer.parseInt(checker.configValues.get("upper-bound"));
+        int lineDistance = Integer.parseInt(checker.configValues.get("line-distance"));
+
         frame = new JFrame();
         panel = new JPanel();
         frame.setResizable(false);
@@ -76,12 +103,17 @@ public class GUI {
         titleLabel = new JLabel("Title name: ");
         playlistLabel = new JLabel("Download playlist?");
         playlistTo = new JLabel(" to");
+        downloadSectionLabel = new JLabel("Download ");
+        downloadTo = new JLabel(" to");
         linkText = new JTextField();
         artistText = new JTextField();
         albumText = new JTextField();
         titleText = new JTextField();
         playlistStart = new JTextField();
         playlistEnd = new JTextField();
+        downloadChapterField = new JTextField();
+        downloadStartStamp = new JTextField();
+        downloadEndStamp = new JTextField();
         defaultArtist = new JRadioButton("detect");
         customArtist = new JRadioButton();
         selectArtist = new ButtonGroup();
@@ -96,12 +128,15 @@ public class GUI {
         noPlaylist = new JRadioButton("No");
         customPlaylist = new JRadioButton("From index");
         downloadPlaylist = new ButtonGroup();
+        downloadFull = new JRadioButton("Full video");
+        downloadChapter = new JRadioButton("Chapter");
+        downloadTimestamp = new JRadioButton("From");
+        downloadSections = new ButtonGroup();
         download = new JButton("Download");
         downloadProgress = new JProgressBar();
         outputDirectoryChooser = new JFileChooser();
         outputDirectoryTextField = new JTextField();
         outputDirectoryChooserButton = new JButton("...");
-
         frame.setSize(frameWidth, frameHeight);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -136,7 +171,7 @@ public class GUI {
         panel.add(defaultArtist);
         panel.add(customArtist);
 
-        albumLabel.setBounds(leftBound, upperBound + 2*lineDistance, 100, lineDistance);
+        albumLabel.setBounds(leftBound, artistLabel.getY() + lineDistance, 100, lineDistance);
         albumLabel.setEnabled(false);
         panel.add(albumLabel);
 
@@ -161,7 +196,7 @@ public class GUI {
         panel.add(singleAlbum);
         panel.add(customAlbum);
 
-        titleLabel.setBounds(leftBound, upperBound + 3*lineDistance, 100, lineDistance);
+        titleLabel.setBounds(leftBound, albumLabel.getY() + lineDistance, 100, lineDistance);
         titleLabel.setEnabled(false);
         panel.add(titleLabel);
 
@@ -182,7 +217,7 @@ public class GUI {
         panel.add(defaultTitle);
         panel.add(customTitle);
 
-        playlistLabel.setBounds(leftBound, upperBound + 4*lineDistance, 140, lineDistance);
+        playlistLabel.setBounds(leftBound, titleLabel.getY() + lineDistance, 140, lineDistance);
         playlistLabel.setEnabled(false);
         panel.add(playlistLabel);
 
@@ -219,17 +254,57 @@ public class GUI {
         panel.add(noPlaylist);
         panel.add(customPlaylist);
 
+        downloadSectionLabel.setBounds(leftBound, playlistLabel.getY() + lineDistance, 75, lineDistance);
+        downloadSectionLabel.setEnabled(false);
+        panel.add(downloadSectionLabel);
+
+        downloadFull.setBounds(downloadSectionLabel.getX() + downloadSectionLabel.getWidth(), downloadSectionLabel.getY(), 100, lineDistance);
+        downloadFull.setSelected(true);
+        downloadFull.setEnabled(false);
+
+        downloadChapter.setBounds(downloadFull.getX() + downloadFull.getWidth(), downloadSectionLabel.getY(), 82, lineDistance);
+        downloadChapter.setEnabled(false);
+
+        downloadChapterField.setBounds(downloadChapter.getX() + downloadChapter.getWidth(), downloadSectionLabel.getY(), 100, lineDistance);
+        downloadChapterField.setEnabled(false);
+        panel.add(downloadChapterField);
+
+        downloadTimestamp.setBounds(downloadChapterField.getX() + downloadChapterField.getWidth(), downloadSectionLabel.getY(), 60, lineDistance);
+        downloadTimestamp.setEnabled(false);
+
+        downloadStartStamp.setBounds(downloadTimestamp.getX() + downloadTimestamp.getWidth(), downloadSectionLabel.getY(), 70, lineDistance);
+        downloadStartStamp.setEnabled(false);
+        downloadStartStamp.setText("hh:mm:ss");
+        downloadStartStamp.setHorizontalAlignment(JTextField.RIGHT);
+        panel.add(downloadStartStamp);
+
+        downloadTo.setBounds(downloadStartStamp.getX() + downloadStartStamp.getWidth(), downloadSectionLabel.getY(), 23, lineDistance);
+        downloadTo.setEnabled(false);
+        panel.add(downloadTo);
+
+        downloadEndStamp.setBounds(downloadTo.getX() + downloadTo.getWidth(), downloadSectionLabel.getY(), 70, lineDistance);
+        downloadEndStamp.setEnabled(false);
+        downloadEndStamp.setText("hh:mm:ss");
+        downloadEndStamp.setHorizontalAlignment(JTextField.RIGHT);
+        panel.add(downloadEndStamp);
+
+        downloadSections.add(downloadFull);
+        downloadSections.add(downloadChapter);
+        downloadSections.add(downloadTimestamp);
+        panel.add(downloadFull);
+        panel.add(downloadChapter);
+        panel.add(downloadTimestamp);
 
         outputDirectoryChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-        outputDirectoryTextField.setBounds(frameWidth/2 - 20 - 200/2, frameHeight - 140, 200, 25);
+        outputDirectoryTextField.setBounds(frameWidth/2 - 20 - 200/2, downloadSectionLabel.getY() + downloadSectionLabel.getHeight() + lineDistance, 200, 25);
         outputDirectoryTextField.setEnabled(false);
         panel.add(outputDirectoryTextField);
 
         outputDirectoryChooserButton.setBounds(outputDirectoryTextField.getX() + outputDirectoryTextField.getWidth(), outputDirectoryTextField.getY(), 20, 25);
         panel.add(outputDirectoryChooserButton);
 
-        download.setBounds(frameWidth/2 - 150/2, frameHeight - 100, 150, 25);
+        download.setBounds(frameWidth/2 - 150/2, outputDirectoryTextField.getY() + outputDirectoryTextField.getHeight() + 10, 150, 25);
 
         download.setEnabled(false);
         panel.add(download);
