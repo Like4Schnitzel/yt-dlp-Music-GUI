@@ -2,8 +2,9 @@ ffmpeg-path=ffmpeg
 yt-dlp-path=yt-dlp
 
 delay-seconds=1
+replace-chars=<>:"/\|?*
 
-frame-width=600
+frame-width=620
 frame-height=350
 left-bound=10
 upper-bound=20
