@@ -1,5 +1,3 @@
-import javax.swing.*;
-
 public class Main {
     public static void main(String[] args) {
         DependencyChecker checker = new DependencyChecker();
@@ -12,7 +10,7 @@ public class Main {
         Loader loader;
         try {
             mainWindow = new GUI(checker);
-            loader = new Loader(mainWindow, checker, Integer.parseInt(checker.configValues.get("delay-seconds")));
+            loader = new Loader(mainWindow, checker);
         } catch (NumberFormatException e) {
             ErrorMessage confValues = new ErrorMessage("<html>Config values for window layout <br> must only be integers.", 300, 150);
             confValues.errorMessage.setBounds(confValues.errorMessage.getX(), confValues.errorMessage.getY(), confValues.errorMessage.getWidth(), 30);
