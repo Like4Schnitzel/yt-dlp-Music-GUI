@@ -87,6 +87,7 @@ public class GUI {
     }
 
     public GUI(DependencyChecker checker) {
+        int extraRightBoundOnWindows = System.getProperty("os.name").toLowerCase().contains("win") ? 20 : 0;
         int frameWidth = Integer.parseInt(checker.configValues.get("frame-width"));
         int frameHeight = Integer.parseInt(checker.configValues.get("frame-height"));
         int leftBound = Integer.parseInt(checker.configValues.get("left-bound"));
@@ -148,7 +149,7 @@ public class GUI {
         linkLabel.setBounds(leftBound, upperBound, 50, lineDistance);
         panel.add(linkLabel);
 
-        linkText.setBounds(linkLabel.getX() + linkLabel.getWidth(), upperBound, frameWidth - leftBound - linkLabel.getX() - linkLabel.getWidth(), lineDistance);
+        linkText.setBounds(linkLabel.getX() + linkLabel.getWidth(), upperBound, frameWidth - extraRightBoundOnWindows - leftBound - linkLabel.getX() - linkLabel.getWidth(), lineDistance);
         panel.add(linkText);
 
         artistLabel.setBounds(leftBound, upperBound + lineDistance, 100,  lineDistance);
@@ -162,7 +163,7 @@ public class GUI {
         customArtist.setBounds(defaultArtist.getX() + defaultArtist.getWidth(), artistLabel.getY(), 20, lineDistance);
         customArtist.setEnabled(false);
 
-        artistText.setBounds(customArtist.getX() + customArtist.getWidth(), artistLabel.getY(), frameWidth - leftBound - customArtist.getX() - customArtist.getWidth(), lineDistance);
+        artistText.setBounds(customArtist.getX() + customArtist.getWidth(), artistLabel.getY(), frameWidth - extraRightBoundOnWindows - leftBound - customArtist.getX() - customArtist.getWidth(), lineDistance);
         artistText.setEnabled(false);
         panel.add(artistText);
 
@@ -185,7 +186,7 @@ public class GUI {
         customAlbum.setBounds(singleAlbum.getX() + singleAlbum.getWidth(), albumLabel.getY(), 20, lineDistance);
         customAlbum.setEnabled(false);
 
-        albumText.setBounds(customAlbum.getX() + customAlbum.getWidth(), albumLabel.getY(), frameWidth - leftBound - customAlbum.getX() - customAlbum.getWidth(), lineDistance);
+        albumText.setBounds(customAlbum.getX() + customAlbum.getWidth(), albumLabel.getY(), frameWidth- extraRightBoundOnWindows - leftBound - customAlbum.getX() - customAlbum.getWidth(), lineDistance);
         albumText.setEnabled(false);
         panel.add(albumText);
 
