@@ -43,8 +43,9 @@ ffmpeg-path=ffmpeg
 yt-dlp-path=yt-dlp
 
 delay-seconds=1
+replace-chars=<>:"/\|?*
 
-frame-width=600
+frame-width=620
 frame-height=350
 left-bound=10
 upper-bound=20
@@ -60,6 +61,8 @@ Explanation as to what these variables do:
     delay-seconds     The amount of delay before the validity of the URL that is entered is checked. This timer
                       gets reset whenever the text field receives a change. This is in place to make editing said
                       field possible.
+    replace-chars     Specify characters in the file name to replace with underscores to deal with naming conventions.
+                      If you put spaces inbetween the characters it will replace all spaces with underscores.
 ## GUI Options:
     frame-width       Specifies the width of the main window in pixels.
     frame-height      Specifies the height of the main window in pixels.
