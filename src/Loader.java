@@ -26,14 +26,14 @@ public class Loader {
     private DependencyChecker checker;
     private int checkDelaySeconds;
 
-    public Loader(GUI gui, DependencyChecker dependencyChecker, int delaySeconds) {
+    public Loader(GUI gui, DependencyChecker dependencyChecker) {
         mainWindow = gui;
         waiting = false;
         downloadAsPlaylist = false;
         playlistCount = 0;
         time = LocalTime.now();
-        checkDelaySeconds = delaySeconds;
         checker = dependencyChecker;
+        checkDelaySeconds = Integer.parseInt(checker.configValues.get("delay-seconds"));
     }
 
     public void setKeyListener() {
@@ -746,7 +746,7 @@ public class Loader {
 
     public String formatForFilename(String str) {
         //characters to replace with underscores
-        char[] checkChars = {':', '/', '?', '\"'};
+        char[] checkChars = checker.configValues.get("replace-chars").toCharArray();
         String returnString = "";
 
         for (int i = 0; i < str.length(); i++) {
