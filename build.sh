@@ -1,2 +1,2 @@
 javac -d build/ src/*
-jar -cvf build/yt-dlp-Music-GUI.jar build/*.class
+jar -cvmf MANIFEST.MF build/yt-dlp-Music-GUI.jar build/*.class
