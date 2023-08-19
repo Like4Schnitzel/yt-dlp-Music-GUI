@@ -36,7 +36,7 @@ public class ErrorMessage {
     }
 
     public ErrorMessage(String errorText) {
-        createErrorMessage(errorText, 300, 120);
+        createErrorMessage(errorText, 300, 140);
     }
 
     public ErrorMessage(String errorText, int frameWidth, int frameHeight) {
