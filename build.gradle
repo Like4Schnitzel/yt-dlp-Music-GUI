@@ -12,7 +12,7 @@ plugins {
 apply plugin: 'java'
 
 ext {
-    javaMainClass = 'main.java.Main'
+    javaMainClass = 'Main'
 }
 
 application {
@@ -21,6 +21,6 @@ application {
 
 jar {
     manifest {
-        attributes 'Main-Class': 'main.java.Main'
+        attributes 'Main-Class': javaMainClass
     }
 }
