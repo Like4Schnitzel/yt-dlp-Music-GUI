@@ -763,6 +763,8 @@ public class Loader {
             waiting = false;
             mainWindow.linkLabel.setEnabled(true);
             mainWindow.linkText.setEnabled(true);
+
+            mainWindow.downloadProgress.setVisible(false);
         }).start();
     }
 
