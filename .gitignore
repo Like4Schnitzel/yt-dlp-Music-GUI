@@ -1,2 +1,4 @@
 build
 run.sh
+# Ignore Gradle project-specific cache directory
+.gradle
