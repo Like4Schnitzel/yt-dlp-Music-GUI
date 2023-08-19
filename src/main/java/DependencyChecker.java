@@ -61,15 +61,15 @@ public class DependencyChecker {
             configValues.put("line-distance", "25");
             Scanner configReader = new Scanner(new File(currentDirectory + "/config.txt"));
             String configString = "";
-            for (int i = 0; configReader.hasNextLine(); i++) {
+            for (int i = 1; configReader.hasNextLine(); i++) {
                 configString = configReader.nextLine();
                 if (configString.equals("")) {
                     continue;
                 }
                 String[] substrings = configString.split("=");
                 if (substrings.length != 2) {
-                    new ErrorMessage("config.txt syntax is incorrect.");
-                    return false;
+                    new ErrorMessage("Unexpected config.txt content at line " + i + ".");
+                    continue;
                 }
 
                 if (substrings[0].contains("path")) {
