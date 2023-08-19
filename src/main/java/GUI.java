@@ -12,6 +12,7 @@ public class GUI {
     JLabel playlistTo;
     JLabel downloadSectionLabel;
     JLabel downloadTo;
+    JLabel keepTrackNumber;
     JRadioButton defaultArtist;
     JRadioButton customArtist;
     ButtonGroup selectArtist;
@@ -38,6 +39,7 @@ public class GUI {
     JTextField titleText;
     JTextField playlistStart;
     JTextField playlistEnd;
+    JCheckBox toggleTrackIndexKeeping;
     JTextField downloadChapterField;
     JTextField downloadStartStamp;
     JTextField downloadEndStamp;
@@ -72,6 +74,7 @@ public class GUI {
         playlistStart.setEnabled(enabled);
         playlistTo.setEnabled(enabled);
         playlistEnd.setEnabled(enabled);
+        toggleTrackIndexKeeping.setEnabled(enabled);
 
         downloadSectionLabel.setEnabled(enabled);
         downloadFull.setEnabled(enabled);
@@ -107,12 +110,14 @@ public class GUI {
         playlistTo = new JLabel(" to");
         downloadSectionLabel = new JLabel("Download ");
         downloadTo = new JLabel(" to");
+        keepTrackNumber = new JLabel("Keep track numbers?");
         linkText = new JTextField();
         artistText = new JTextField();
         albumText = new JTextField();
         titleText = new JTextField();
         playlistStart = new JTextField();
         playlistEnd = new JTextField();
+        toggleTrackIndexKeeping = new JCheckBox();
         downloadChapterField = new JTextField();
         downloadStartStamp = new JTextField();
         downloadEndStamp = new JTextField();
@@ -230,7 +235,7 @@ public class GUI {
         noPlaylist.setEnabled(false);
         noPlaylist.setSelected(true);
 
-        customPlaylist.setBounds(noPlaylist.getX() + noPlaylist.getWidth(), playlistLabel.getY(), 103, lineDistance);
+        customPlaylist.setBounds(noPlaylist.getX() + noPlaylist.getWidth(), playlistLabel.getY(), 93, lineDistance);
         customPlaylist.setEnabled(false);
 
         playlistStart.setBounds(customPlaylist.getX() + customPlaylist.getWidth(), playlistLabel.getY(), 30, lineDistance);
@@ -239,7 +244,7 @@ public class GUI {
         playlistStart.setHorizontalAlignment(JTextField.RIGHT);
         panel.add(playlistStart);
 
-        playlistTo.setBounds(playlistStart.getX() + playlistStart.getWidth(), playlistLabel.getY(), 23, lineDistance);
+        playlistTo.setBounds(playlistStart.getX() + playlistStart.getWidth(), playlistLabel.getY(), 18, lineDistance);
         playlistTo.setEnabled(false);
         panel.add(playlistTo);
 
@@ -255,6 +260,14 @@ public class GUI {
         panel.add(yesPlaylist);
         panel.add(noPlaylist);
         panel.add(customPlaylist);
+
+        toggleTrackIndexKeeping.setBounds(playlistEnd.getX() + playlistEnd.getWidth() + 20, playlistLabel.getY(), 22, lineDistance);
+        toggleTrackIndexKeeping.setEnabled(false);
+        panel.add(toggleTrackIndexKeeping);
+
+        keepTrackNumber.setBounds(toggleTrackIndexKeeping.getX() + toggleTrackIndexKeeping.getWidth(), playlistLabel.getY(), 126, lineDistance);
+        keepTrackNumber.setEnabled(false);
+        panel.add(keepTrackNumber);
 
         downloadSectionLabel.setBounds(leftBound, playlistLabel.getY() + lineDistance, 75, lineDistance);
         downloadSectionLabel.setEnabled(false);
