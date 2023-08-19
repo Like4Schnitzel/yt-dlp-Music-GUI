@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Arrays;
 
 import static java.lang.Integer.parseInt;
 
@@ -423,8 +424,40 @@ public class Loader {
                     mainWindow.downloadProgress.setValue(mainWindow.downloadProgress.getMinimum());
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {checker.configValues.get("yt-dlp-path"), "--playlist-start", "set later [2]", "--playlist-end", "set later [4]", "--youtube-skip-dash-manifest", "--add-metadata", "--embed-thumbnail", "--format", "m4a", "-o", "set later [11]", "--ppa", "set later [13]", "--no-mtime", !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? "--ffmpeg-location" : "", !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? checker.configValues.get("ffmpeg-path") : "", mainWindow.linkText.getText()};
-                    String[] playlistTrackNames = {checker.configValues.get("yt-dlp-path"), "--skip-download", "--print", "title", "--print", "track", "--playlist-start", mainWindow.playlistStart.getText(), "--playlist-end", mainWindow.playlistEnd.getText(), mainWindow.linkText.getText()};
+                    String[] downloader = {
+                        checker.configValues.get("yt-dlp-path"),
+                        "--playlist-start",
+                        "set later [2]",
+                        "--playlist-end",
+                        "set later [4]",
+                        "--youtube-skip-dash-manifest",
+                        "--add-metadata",
+                        "--embed-thumbnail",
+                        "--format",
+                        "m4a",
+                        "-o",
+                        "set later [11]",
+                        "--ppa",
+                        "set later [13]",
+                        "--no-mtime",
+                        mainWindow.toggleTrackIndexKeeping.isSelected() ? "--parse-metadata" : "",
+                        mainWindow.toggleTrackIndexKeeping.isSelected() ? "playlist_index:%(track_number)s" : "",
+                        !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? "--ffmpeg-location" : "",
+                        !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? checker.configValues.get("ffmpeg-path") : "", mainWindow.linkText.getText()
+                    };
+                    String[] playlistTrackNames = {
+                        checker.configValues.get("yt-dlp-path"),
+                        "--skip-download",
+                        "--print",
+                        "title",
+                        "--print",
+                        "track",
+                        "--playlist-start",
+                        mainWindow.playlistStart.getText(),
+                        "--playlist-end",
+                        mainWindow.playlistEnd.getText(),
+                        mainWindow.linkText.getText()
+                    };
                     try {
                         Runtime nameRuntime = Runtime.getRuntime();
                         Process getNames = nameRuntime.exec(playlistTrackNames);
@@ -461,11 +494,13 @@ public class Loader {
                                 downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
 
                                 try {
+                                    System.out.println("Downloading with command `" + String.join(" ", downloader) + "`");
                                     Process downloading = downloadRuntime.exec(downloader);
                                     BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
 
                                     String s1;
                                     while ((s1 = stdInput1.readLine()) != null) {
+                                        System.out.println(s1);
                                         if (s1.length() > 15 && s1.startsWith("[download]") && s1.charAt(16) == '%') {
                                             mainWindow.downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + (i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
                                             mainWindow.downloadProgress.setString("Downloading video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
