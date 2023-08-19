@@ -6,7 +6,17 @@
  */
 
 plugins {
-    id 'java'
+    id 'application'
+}
+
+apply plugin: 'java'
+
+ext {
+    javaMainClass = 'main.java.Main'
+}
+
+application {
+    mainClassName = javaMainClass
 }
 
 jar {
