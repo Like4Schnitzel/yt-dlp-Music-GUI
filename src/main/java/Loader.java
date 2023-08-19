@@ -263,6 +263,8 @@ public class Loader {
         mainWindow.playlistTo.setEnabled(mainWindow.customPlaylist.isSelected());
         mainWindow.playlistEnd.setEnabled(mainWindow.customPlaylist.isSelected());
         mainWindow.playlistEnd.setText(mainWindow.noPlaylist.isSelected() ? "NA" : Integer.toString(playlistCount));
+        mainWindow.toggleTrackIndexKeeping.setEnabled(!mainWindow.noPlaylist.isSelected());
+        mainWindow.keepTrackNumber.setEnabled(!mainWindow.noPlaylist.isSelected());
         downloadAsPlaylist = !mainWindow.noPlaylist.isSelected();
         setSectionsEnabled(mainWindow.noPlaylist.isSelected());
 
@@ -620,7 +622,7 @@ public class Loader {
             if (Duration.between(time, LocalTime.now()).getSeconds() < checkDelaySeconds){
                 waiting = true;
                 while(Duration.between(time, LocalTime.now()).getSeconds() < checkDelaySeconds) {
-                    System.out.println("Current time = " + LocalTime.now() + "\nTime to compare = " + time);
+                    //System.out.println("Current time = " + LocalTime.now() + "\nTime to compare = " + time);
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -709,6 +711,8 @@ public class Loader {
                 mainWindow.customPlaylist.setEnabled(isList);
                 mainWindow.playlistStart.setText(isList ? "1" : "NA");
                 mainWindow.playlistEnd.setText(isList ? Integer.toString(playlistCount) : "NA");
+                mainWindow.toggleTrackIndexKeeping.setEnabled(isList);
+                mainWindow.keepTrackNumber.setEnabled(isList);
                 downloadAsPlaylist = isList;
 
                 if (isList) {

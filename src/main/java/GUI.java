@@ -75,6 +75,7 @@ public class GUI {
         playlistTo.setEnabled(enabled);
         playlistEnd.setEnabled(enabled);
         toggleTrackIndexKeeping.setEnabled(enabled);
+        keepTrackNumber.setEnabled(enabled);
 
         downloadSectionLabel.setEnabled(enabled);
         downloadFull.setEnabled(enabled);
