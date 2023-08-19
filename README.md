@@ -26,17 +26,20 @@ Current features are:
 + Packaging yt-dlp and ffmpeg with the .jar file
 + Downloading chapters
 + Downloading from a specified timestamp to another
++ Keeping playlist indices as track numbers
 
 Planned features:
-+ Adding more config variables upon demand.
-+ Improving flexibility of the UI to allow for better scaling.
++ Adding more config variables upon demand
++ Auto downloading dependencies
++ Improving flexibility of the UI to allow for better scaling
++ Regex for titles in playlists
 
 ## Config file documentation
 You can create a file named `config.txt` in the same directory as the .jar file to specify a few variables. The syntax is as follows:
 ```
 variable-name=value
 ```
-Empty lines get ignored, lack of an equals sign will result in an error. Spaces before and after the sign will not be ignored.
+Empty lines get ignored, lack of an equals sign will result in an error, causing the line to get ignored. Spaces before and after the sign will not be ignored.
 If the file could not be found or a variable that is used in the program hasn't been assigned in the file, it instead assumes it's default value. Below is a template of a `config.txt` file with all currently available variables and their default values.
 ```
 ffmpeg-path=ffmpeg
