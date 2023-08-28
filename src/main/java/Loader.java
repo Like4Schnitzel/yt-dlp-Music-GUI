@@ -99,7 +99,7 @@ public class Loader {
     public void setTitleListeners() {
         mainWindow.defaultTitle.addActionListener(e -> {
             mainWindow.titleText.setEnabled(false);
-            if(mainWindow.yesPlaylist.isSelected()) {
+            if(!mainWindow.noPlaylist.isSelected()) {
                 mainWindow.titleText.setText("detect");
             } else {
                 mainWindow.titleText.setText(title);
@@ -256,7 +256,7 @@ public class Loader {
     }
 
     private void updatePlaylistButtons() {
-        mainWindow.customTitle.setEnabled(mainWindow.noPlaylist.isSelected());
+        //mainWindow.customTitle.setEnabled(mainWindow.noPlaylist.isSelected());
         mainWindow.playlistStart.setEnabled(mainWindow.customPlaylist.isSelected());
         mainWindow.playlistStart.setText(mainWindow.noPlaylist.isSelected() ? "NA" : "1");
         mainWindow.playlistTo.setEnabled(mainWindow.customPlaylist.isSelected());
@@ -271,9 +271,11 @@ public class Loader {
             updateSectionButtons();
             mainWindow.titleText.setText(title);
         } else {
-            mainWindow.defaultTitle.setSelected(true);
-            mainWindow.titleText.setEnabled(false);
-            mainWindow.titleText.setText("detect");
+            //mainWindow.defaultTitle.setSelected(true);
+            if (mainWindow.defaultTitle.isSelected()) {
+                mainWindow.titleText.setEnabled(false);
+                mainWindow.titleText.setText("detect");
+            }
         }
     }
 
@@ -407,7 +409,7 @@ public class Loader {
     public void setDownloadListener() {
         mainWindow.download.addActionListener(e -> {
             boolean albumDetectEnabled = mainWindow.defaultAlbum.isEnabled();
-            boolean customTitleEnabled = mainWindow.customTitle.isEnabled();
+            //boolean customTitleEnabled = mainWindow.customTitle.isEnabled();
             boolean playlistEnabled = mainWindow.playlistLabel.isEnabled();
 
             mainWindow.setAllEnabled(false);
@@ -575,7 +577,7 @@ public class Loader {
                 mainWindow.artistText.setEnabled(mainWindow.customArtist.isSelected());
                 mainWindow.defaultAlbum.setEnabled(albumDetectEnabled);
                 mainWindow.albumText.setEnabled(mainWindow.customAlbum.isSelected());
-                mainWindow.customTitle.setEnabled(customTitleEnabled);
+                //mainWindow.customTitle.setEnabled(customTitleEnabled);
                 mainWindow.titleText.setEnabled(mainWindow.customTitle.isSelected());
                 if (!playlistEnabled) {
                     mainWindow.playlistLabel.setEnabled(false);
@@ -735,7 +737,7 @@ public class Loader {
                 }
 
                 mainWindow.titleText.setText(isList ? "detect" : title);
-                mainWindow.customTitle.setEnabled(!isList);
+                //mainWindow.customTitle.setEnabled(!isList);
                 mainWindow.playlistLabel.setEnabled(isList);
                 mainWindow.yesPlaylist.setEnabled(isList);
                 mainWindow.yesPlaylist.setSelected(isList);
