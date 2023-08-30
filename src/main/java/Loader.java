@@ -432,27 +432,7 @@ public class Loader {
                     mainWindow.downloadProgress.setValue(mainWindow.downloadProgress.getMinimum());
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {
-                        checker.configValues.get("yt-dlp-path"),
-                        "--playlist-start",
-                        "set later [2]",
-                        "--playlist-end",
-                        "set later [4]",
-                        "--youtube-skip-dash-manifest",
-                        "--add-metadata",
-                        "--embed-thumbnail",
-                        "--format",
-                        "m4a",
-                        "-o",
-                        "set later [11]",
-                        "--ppa",
-                        "set later [13]",
-                        "--no-mtime",
-                        mainWindow.toggleTrackIndexKeeping.isSelected() ? "--parse-metadata" : "",
-                        mainWindow.toggleTrackIndexKeeping.isSelected() ? "playlist_index:%(track_number)s" : "",
-                        !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? "--ffmpeg-location" : "",
-                        !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? checker.configValues.get("ffmpeg-path") : "", mainWindow.linkText.getText()
-                    };
+                    String[] downloader = downloadCommandBuilder(); //indexes 2, 4, 11 and 13 to be set later
                     String[] playlistTrackNames = {
                         checker.configValues.get("yt-dlp-path"),
                         "--skip-download",
@@ -812,11 +792,9 @@ public class Loader {
 
     //builds the download command
     private String[] downloadCommandBuilder() {
-        int arguments;
         ArrayList<String> downloader = new ArrayList<String>();
         downloader.add(checker.configValues.get("yt-dlp-path"));
         if (!downloadAsPlaylist) {
-            arguments = 12;  //minimum
             //guaranteed arguments
             downloader.add("--no-playlist");
             downloader.add("--youtube-skip-dash-manifest");
@@ -831,7 +809,6 @@ public class Loader {
 
             //conditional arguments
             if (!mainWindow.downloadFull.isSelected()) {
-                arguments += 2;
 
                 downloader.add("--download-sections");
                 if (mainWindow.downloadChapter.isSelected()) {
@@ -840,20 +817,42 @@ public class Loader {
                     downloader.add("*" + mainWindow.downloadStartStamp.getText() + "-" + mainWindow.downloadEndStamp.getText());
                 }
             } else {
-                arguments += 1;
                 downloader.add("--add-metadata");
             }
             if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
-                arguments += 2;
                 downloader.add("--ffmpeg-location");
                 downloader.add(checker.configValues.get("ffmpeg-path"));
             }
         } else {    //download playlist
-            arguments = 1;  //minimum
+            //guaranteed arguments
+            downloader.add("--playlist-start");
+            downloader.add("");     //has to be set later, don't move from index 2
+            downloader.add("--playlist-end");
+            downloader.add("");     //has to be set later, don't move from index 4
+            downloader.add("--youtube-skip-dash-manifest");
+            downloader.add("--add-metadata");
+            downloader.add("--embed-thumbnail");
+            downloader.add("--format");
+            downloader.add("m4a");
+            downloader.add("-o");
+            downloader.add("");     //has to be set later, don't move from index 11
+            downloader.add("--ppa");
+            downloader.add("");     //has to be set later, don't move from index 13
+            downloader.add("--no-mtime");
+
+            //conditional arguments
+            if (mainWindow.toggleTrackIndexKeeping.isSelected()) {
+                downloader.add("--parse-metadata");
+                downloader.add("playlist_index:%(track_number)s");
+            }
+            if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
+                downloader.add("--ffmpeg-location");
+                downloader.add(checker.configValues.get("ffmpeg-path"));
+            }
         }
 
         downloader.add(mainWindow.linkText.getText());
-        return downloader.toArray(new String[arguments]);
+        return downloader.toArray(new String[downloader.size()]);
     }
 
     private boolean charArrayContainsChar(char[] arr, char c) {
