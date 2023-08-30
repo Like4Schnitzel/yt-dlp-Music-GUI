@@ -91,7 +91,11 @@ public class Loader {
 
         mainWindow.singleAlbum.addActionListener(e -> {
             mainWindow.albumText.setEnabled(false);
-            mainWindow.albumText.setText(mainWindow.titleText.getText());
+            if (mainWindow.noPlaylist.isSelected()) {
+                mainWindow.albumText.setText(mainWindow.titleText.getText());
+            } else {
+                mainWindow.albumText.setText("same as title");
+            }
         });
 
         mainWindow.customAlbum.addActionListener(e -> {
@@ -134,9 +138,7 @@ public class Loader {
             public void updateSingle() {
                 if (!mainWindow.noPlaylist.isSelected() && mainWindow.customTitle.isSelected()) {
                     mainWindow.download.setEnabled(checkCustomTitleRegex(mainWindow.titleText.getText()));
-                }
-
-                if(mainWindow.singleAlbum.isSelected()) {
+                } else if(mainWindow.singleAlbum.isSelected()) {
                     mainWindow.albumText.setText(mainWindow.titleText.getText());
                 }
             }
@@ -457,7 +459,11 @@ public class Loader {
                         String currentTitle = "";
                         for (int i = 0; (s = stdInput.readLine()) != null; i++) {
                             if (i % 2 == 0) {
-                                currentTitle = s;
+                                if (mainWindow.customTitle.isSelected()) {
+                                    currentTitle = applyRegexToTitle(s, mainWindow.titleText.getText());
+                                } else {
+                                    currentTitle = s;
+                                }
                             } else {
                                 if (mainWindow.singleAlbum.isSelected()) {
                                     currentAlbum = currentTitle;
@@ -472,9 +478,13 @@ public class Loader {
                                 downloader[4] = downloader[2];
                                 if (!s.equals("NA")) {
                                     //download with track
-                                    currentTitle = s;
+                                    if (mainWindow.customTitle.isSelected()) {
+                                        currentTitle = applyRegexToTitle(s, mainWindow.titleText.getText());
+                                    } else {
+                                        currentTitle = s;
+                                    }
                                     if (mainWindow.singleAlbum.isSelected()) {
-                                        currentAlbum = s;
+                                        currentAlbum = currentTitle;
                                     }
                                 }
 
@@ -875,14 +885,7 @@ public class Loader {
         return count;
     }
 
-    private boolean checkCustomTitleRegex(String s) {
-        int slashCount = countCharsInString(s, '/');
-        if (slashCount < 2) {
-            return false;
-        }
-
-        //subtract escaped slashes within regex
-        //and split regex from non-regex
+    private String[] splitRegex(String s) {
         ArrayList<String> splitString = new ArrayList<String>();
         String toAdd = "";
         boolean inRegex = false;
@@ -892,7 +895,6 @@ public class Loader {
                 //check for \/
                 if (inRegex && i > 0 && s.charAt(i-1) == '\\') {
                     toAdd += c;
-                    slashCount--;
                 } else {    //regular /
                     splitString.add(toAdd);
                     toAdd = "";
@@ -903,17 +905,41 @@ public class Loader {
             }
         }
         splitString.add(toAdd);
+        
+        return splitString.toArray(new String[splitString.size()]);
+    }
+
+    private boolean checkCustomTitleRegex(String s) {
+        int slashCount = countCharsInString(s, '/');
+        if (slashCount < 2) {
+            return false;
+        }
+
+        //subtract escaped slashes within regex
+        String[] splitString = splitRegex(s);
+        for (int i = 0; i < splitString.length; i++) {
+            if (i % 2 == 1) {
+                int lastIndex = 0;
+                while (lastIndex != -1) {
+                    lastIndex = splitString[i].indexOf("\\/", lastIndex);
+                    if (lastIndex != -1) {  //a match could be found
+                        slashCount--;
+                        lastIndex += 2; //"\\/" is of length 2
+                    }
+                }
+            }
+        }
 
         if (slashCount < 1 || slashCount % 2 == 1) {
             return false;
         }
 
-        for (int i = 0; i < splitString.size(); i++) {
+        for (int i = 0; i < splitString.length; i++) {
             if (i % 2 == 0) {
                 continue;
             }
 
-            if (!checkRegexValidity(splitString.get(i))) {
+            if (!checkRegexValidity(splitString[i])) {
                 return false;
             }
         }
@@ -931,5 +957,24 @@ public class Loader {
         }
         Matcher m = p.matcher("");
         return m.groupCount() == 1 && s.matches(".*\\(.+\\).*");
+    }
+    
+    private String applyRegexToTitle(String titleString, String regexString) {
+        String[] regexParts = splitRegex(regexString);
+        String output = "";
+
+        for (int i = 0; i < regexParts.length; i++) {    //alternates between text and regex
+            if (i % 2 == 0) {
+                output += regexParts[i];
+            } else {
+                Pattern p = Pattern.compile(regexParts[i]);
+                Matcher m = p.matcher(titleString);
+                if (m.find()) {
+                    output += m.group(1);
+                }   //otherwise just don't add anything
+            }
+        }
+
+        return output;
     }
 }
