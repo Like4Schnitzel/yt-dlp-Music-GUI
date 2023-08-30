@@ -809,8 +809,8 @@ public class Loader {
 
             //conditional arguments
             if (!mainWindow.downloadFull.isSelected()) {
-
                 downloader.add("--download-sections");
+
                 if (mainWindow.downloadChapter.isSelected()) {
                     downloader.add(mainWindow.downloadChapterField.getText());
                 } else {
