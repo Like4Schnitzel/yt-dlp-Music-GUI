@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import static java.lang.Integer.parseInt;
 
@@ -128,6 +132,10 @@ public class Loader {
             }
 
             public void updateSingle() {
+                if (!mainWindow.noPlaylist.isSelected() && mainWindow.customTitle.isSelected()) {
+                    mainWindow.download.setEnabled(checkCustomTitleRegex(mainWindow.titleText.getText()));
+                }
+
                 if(mainWindow.singleAlbum.isSelected()) {
                     mainWindow.albumText.setText(mainWindow.titleText.getText());
                 }
@@ -810,5 +818,73 @@ public class Loader {
         }
 
         return false;
+    }
+
+    private int countCharsInString(String str, char c) {
+        int count = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (c == str.charAt(i)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private boolean checkCustomTitleRegex(String s) {
+        int slashCount = countCharsInString(s, '/');
+        if (slashCount < 2) {
+            return false;
+        }
+
+        //subtract escaped slashes within regex
+        //and split regex from non-regex
+        ArrayList<String> splitString = new ArrayList<String>();
+        String toAdd = "";
+        boolean inRegex = false;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '/') {
+                //check for \/
+                if (inRegex && i > 0 && s.charAt(i-1) == '\\') {
+                    toAdd += c;
+                    slashCount--;
+                } else {    //regular /
+                    splitString.add(toAdd);
+                    toAdd = "";
+                    inRegex = !inRegex;
+                }
+            } else {
+                toAdd += c;
+            }
+        }
+        splitString.add(toAdd);
+
+        if (slashCount < 1 || slashCount % 2 == 1) {
+            return false;
+        }
+
+        for (int i = 0; i < splitString.size(); i++) {
+            if (i % 2 == 0) {
+                continue;
+            }
+
+            if (!checkRegexValidity(splitString.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //Make sure the provided regex contains precisely one capture group.
+    private boolean checkRegexValidity(String s) {
+        Pattern p;
+        try {
+            p = Pattern.compile(s);
+        } catch (PatternSyntaxException e) {
+            //if invalid regex
+            return false;
+        }
+        Matcher m = p.matcher("");
+        return m.groupCount() == 1 && s.matches(".*\\(.+\\).*");
     }
 }
