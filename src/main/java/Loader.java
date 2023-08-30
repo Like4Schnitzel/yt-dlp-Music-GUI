@@ -530,7 +530,7 @@ public class Loader {
                     mainWindow.downloadProgress.setValue(0);
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = {checker.configValues.get("yt-dlp-path"), mainWindow.downloadFull.isSelected() ? "" : "--download-sections", mainWindow.downloadFull.isSelected() ? "" : (mainWindow.downloadChapter.isSelected() ? mainWindow.downloadChapterField.getText() : "*" + mainWindow.downloadStartStamp.getText() + "-" + mainWindow.downloadEndStamp.getText()), "--no-playlist", "--youtube-skip-dash-manifest", mainWindow.downloadFull.isSelected() ? "--add-metadata" : "", "--embed-thumbnail", "--format", "m4a", "-o", outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s", "--ppa", "ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(mainWindow.albumText.getText()) + " -metadata title=" + formatForPPA(mainWindow.titleText.getText()), "--no-mtime", !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? "--ffmpeg-location" : "", !checker.configValues.get("ffmpeg-path").equals("ffmpeg") ? checker.configValues.get("ffmpeg-path") : "", mainWindow.linkText.getText()};
+                    String[] downloader = downloadCommandBuilder();
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -808,6 +808,52 @@ public class Loader {
         }
 
         return returnString;
+    }
+
+    //builds the download command
+    private String[] downloadCommandBuilder() {
+        int arguments;
+        ArrayList<String> downloader = new ArrayList<String>();
+        downloader.add(checker.configValues.get("yt-dlp-path"));
+        if (!downloadAsPlaylist) {
+            arguments = 12;  //minimum
+            //guaranteed arguments
+            downloader.add("--no-playlist");
+            downloader.add("--youtube-skip-dash-manifest");
+            downloader.add("--embed-thumbnail");
+            downloader.add("--format");
+            downloader.add("m4a");
+            downloader.add("-o");
+            downloader.add(outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s");
+            downloader.add("--ppa");
+            downloader.add("ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(mainWindow.albumText.getText()) + " -metadata title=" + formatForPPA(mainWindow.titleText.getText()));
+            downloader.add("--no-mtime");
+
+            //conditional arguments
+            if (!mainWindow.downloadFull.isSelected()) {
+                arguments += 2;
+
+                downloader.add("--download-sections");
+                if (mainWindow.downloadChapter.isSelected()) {
+                    downloader.add(mainWindow.downloadChapterField.getText());
+                } else {
+                    downloader.add("*" + mainWindow.downloadStartStamp.getText() + "-" + mainWindow.downloadEndStamp.getText());
+                }
+            } else {
+                arguments += 1;
+                downloader.add("--add-metadata");
+            }
+            if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
+                arguments += 2;
+                downloader.add("--ffmpeg-location");
+                downloader.add(checker.configValues.get("ffmpeg-path"));
+            }
+        } else {    //download playlist
+            arguments = 1;  //minimum
+        }
+
+        downloader.add(mainWindow.linkText.getText());
+        return downloader.toArray(new String[arguments]);
     }
 
     private boolean charArrayContainsChar(char[] arr, char c) {
