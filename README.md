@@ -1,11 +1,11 @@
 ## For this to run you need to have the following installed:
-+ [**yt-dlp**](https://github.com/yt-dlp/yt-dlp#installation)
-+ [**ffmpeg**](https://ffmpeg.org/download.html)
++ [<u>**yt-dlp**</u>](https://github.com/yt-dlp/yt-dlp#installation)
++ [<u>**ffmpeg**</u>](https://ffmpeg.org/download.html)
 
 You can download the Windows release which comes with executables for both of them and pre-configured path variables.
 
 ## yt-dlp-Music-GUI
-A simple cross platform GUI for downloading songs from YouTube with [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+A simple cross platform GUI for downloading songs from YouTube with [<u>yt-dlp</u>](https://github.com/yt-dlp/yt-dlp).
 The goal of this project was to stop having to think about which arguments to pass every time I want to download a song.
 
 Current features are:
@@ -21,18 +21,28 @@ Current features are:
 + Automatically switching to channel name if there is no artist available
 + A progress bar for the download of both videos and playlists
 + Setting the main download directory (defaults to the user's Music directory)
-+ Making the filenames fit with naming conventions while keeping the metadata unchanged (you can adjust which characters to replace in the function `formatForFileName(String str)` in `Loader.java`)
++ Making the filenames fit with naming conventions while keeping the metadata unchanged (you can adjust which characters to replace in the config)
 + An easy way to configure things
-+ Packaging yt-dlp and ffmpeg with the .jar file
 + Downloading chapters
 + Downloading from a specified timestamp to another
 + Keeping playlist indices as track numbers
++ Regex for titles in playlists
 
 Planned features:
 + Adding more config variables upon demand
-+ Auto downloading dependencies
 + Improving flexibility of the UI to allow for better scaling
-+ Regex for titles in playlists
+
+## How to use regex for playlists
+When the option to download as a playlist is selected you will be able to enter regex into the title input field.\
+Regexes are marked with a forward slash '/' at the start and end.
+Any number of regexes can be used.
+All used regexes must contain exactly one non-empty capture group, the content of which will then be added to the title.
+Within a regex you must escape forwards slashes with a backwards slash, like so: "\\/".\
+Anything outside the marked regexes will be added to the captured strings as constants.\
+**Example**: The input `/(.*) \[/ - Tyson Yen Cover` when used on
+[<u>this video</u>](https://www.youtube.com/watch?v=kzVAtMYwCCE&list=PL6NhlkyT-fwyW-hwgLTvcYN1Bx37RxBIF&index=30 "The Time Has Come [Devil May Cry 4] Cover")
+will result in the title "The Time Has Come - Tyson Yen Cover".
+
 
 ## Config file documentation
 You can create a file named `config.txt` in the same directory as the .jar file to specify a few variables. The syntax is as follows:
