@@ -434,7 +434,7 @@ public class Loader {
                     mainWindow.downloadProgress.setValue(mainWindow.downloadProgress.getMinimum());
 
                     Runtime downloadRuntime = Runtime.getRuntime();
-                    String[] downloader = downloadCommandBuilder(); //indexes 2, 4, 11 and 13 to be set later
+                    String[] downloader = downloadCommandBuilder(); //indexes 2, 4, 10 and 12 to be set later
                     String[] playlistTrackNames = {
                         checker.configValues.get("yt-dlp-path"),
                         "--skip-download",
@@ -488,8 +488,8 @@ public class Loader {
                                     }
                                 }
 
-                                downloader[11] = outputDirectory + "/" + formatForFilename(currentArtist) + "/" + formatForFilename(currentAlbum) + "/" + formatForFilename(currentTitle) + ".%(ext)s";
-                                downloader[13] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
+                                downloader[10] = outputDirectory + "/" + formatForFilename(currentArtist) + "/" + formatForFilename(currentAlbum) + "/" + formatForFilename(currentTitle) + ".%(ext)s";
+                                downloader[12] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
 
                                 try {
                                     System.out.println("Downloading with command `" + String.join(" ", downloader) + "`");
@@ -809,35 +809,25 @@ public class Loader {
         if (!downloadAsPlaylist) {
             // guaranteed arguments
             downloader.add("--no-playlist");
-            downloader.add("--youtube-skip-dash-manifest");
+            downloader.add("--no-mtime");
             downloader.add("--format");
             downloader.add("bestaudio[ext=m4a]");
             downloader.add("-o");
             downloader.add(outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s");
             downloader.add("--ppa");
             downloader.add("ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(mainWindow.albumText.getText()) + " -metadata title=" + formatForPPA(mainWindow.titleText.getText()));
-            downloader.add("--embed-thumbnail");
-            downloader.add("--no-mtime");
             
             //conditional arguments
-            if (mainWindow.toggleThumbnailCrop.isSelected()) {
-                downloader.add("--ppa");
-                downloader.add("ThumbnailsConvertor+ffmpeg_o:-vf crop='ih'");  // crops video thumbnails if needed
-            }
             if (!mainWindow.downloadFull.isSelected()) {
                 downloader.add("--download-sections");
-
+                
                 if (mainWindow.downloadChapter.isSelected()) {
                     downloader.add(mainWindow.downloadChapterField.getText());
                 } else {
                     downloader.add("*" + mainWindow.downloadStartStamp.getText() + "-" + mainWindow.downloadEndStamp.getText());
                 }
             } else {
-                //downloader.add("--add-metadata");
-            }
-            if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
-                downloader.add("--ffmpeg-location");
-                downloader.add(checker.configValues.get("ffmpeg-path"));
+                downloader.add("--add-metadata");
             }
         } else {    //download playlist
             //guaranteed arguments
@@ -845,32 +835,36 @@ public class Loader {
             downloader.add("");     //has to be set later, don't move from index 2
             downloader.add("--playlist-end");
             downloader.add("");     //has to be set later, don't move from index 4
-            downloader.add("--youtube-skip-dash-manifest");
             downloader.add("--add-metadata");
             downloader.add("--format");
             downloader.add("bestaudio[ext=m4a]");
-            downloader.add("-o");
-            downloader.add("");     //has to be set later, don't move from index 11
-            downloader.add("--ppa");
-            downloader.add("");     //has to be set later, don't move from index 13
-            downloader.add("--embed-thumbnail");
             downloader.add("--no-mtime");
-
+            downloader.add("-o");
+            downloader.add("");     //has to be set later, don't move from index 10
+            downloader.add("--ppa");
+            downloader.add("");     //has to be set later, don't move from index 12
+            
             //conditional arguments
             if (mainWindow.toggleTrackIndexKeeping.isSelected()) {
                 downloader.add("--parse-metadata");
                 downloader.add("playlist_index:%(track_number)s");
             }
-            if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
-                downloader.add("--ffmpeg-location");
-                downloader.add(checker.configValues.get("ffmpeg-path"));
-            }
         }
-
+        
+        if (mainWindow.toggleThumbnailCrop.isSelected()) {
+            downloader.add("--ppa");
+            downloader.add("ThumbnailsConvertor+ffmpeg_o:-vf crop='ih'");
+        }
+        if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
+            downloader.add("--ffmpeg-location");
+            downloader.add(checker.configValues.get("ffmpeg-path"));
+        }
+        downloader.add("--youtube-skip-dash-manifest");
+        downloader.add("--embed-thumbnail");
         downloader.add(mainWindow.linkText.getText());
         return downloader.toArray(new String[downloader.size()]);
     }
-
+    
     private boolean charArrayContainsChar(char[] arr, char c) {
         for (int i = 0; i < arr.length; i++) {
             if (c == arr[i]) {
