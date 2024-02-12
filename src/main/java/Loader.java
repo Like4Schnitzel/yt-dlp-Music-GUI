@@ -521,6 +521,7 @@ public class Loader {
 
                     Runtime downloadRuntime = Runtime.getRuntime();
                     String[] downloader = downloadCommandBuilder();
+                    System.out.println("Downloading with the following command: " + String.join(" ", downloader));
                     try {
                         Process proc = downloadRuntime.exec(downloader);
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -666,6 +667,7 @@ public class Loader {
 
             mainWindow.setAllEnabled(false);
             mainWindow.outputDirectoryChooserButton.setEnabled(true);
+            mainWindow.toggleThumbnailCrop.setEnabled(true);
 
             mainWindow.linkText.setEnabled(false);
             time = LocalTime.now();
@@ -801,23 +803,27 @@ public class Loader {
     }
 
     //builds the download command
-    private String[] downloadCommandBuilder() {
+    private String[] downloadCommandBuilder() {        
         ArrayList<String> downloader = new ArrayList<String>();
         downloader.add(checker.configValues.get("yt-dlp-path"));
         if (!downloadAsPlaylist) {
-            //guaranteed arguments
+            // guaranteed arguments
             downloader.add("--no-playlist");
             downloader.add("--youtube-skip-dash-manifest");
-            downloader.add("--embed-thumbnail");
             downloader.add("--format");
-            downloader.add("m4a");
+            downloader.add("bestaudio[ext=m4a]");
             downloader.add("-o");
             downloader.add(outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s");
             downloader.add("--ppa");
             downloader.add("ffmpeg:-metadata artist=" + formatForPPA(mainWindow.artistText.getText()) + " -metadata album=" + formatForPPA(mainWindow.albumText.getText()) + " -metadata title=" + formatForPPA(mainWindow.titleText.getText()));
+            downloader.add("--embed-thumbnail");
             downloader.add("--no-mtime");
-
+            
             //conditional arguments
+            if (mainWindow.toggleThumbnailCrop.isSelected()) {
+                downloader.add("--ppa");
+                downloader.add("ThumbnailsConvertor+ffmpeg_o:-vf crop='ih'");  // crops video thumbnails if needed
+            }
             if (!mainWindow.downloadFull.isSelected()) {
                 downloader.add("--download-sections");
 
@@ -827,7 +833,7 @@ public class Loader {
                     downloader.add("*" + mainWindow.downloadStartStamp.getText() + "-" + mainWindow.downloadEndStamp.getText());
                 }
             } else {
-                downloader.add("--add-metadata");
+                //downloader.add("--add-metadata");
             }
             if (!checker.configValues.get("ffmpeg-path").equals("ffmpeg")) {
                 downloader.add("--ffmpeg-location");
@@ -841,13 +847,13 @@ public class Loader {
             downloader.add("");     //has to be set later, don't move from index 4
             downloader.add("--youtube-skip-dash-manifest");
             downloader.add("--add-metadata");
-            downloader.add("--embed-thumbnail");
             downloader.add("--format");
-            downloader.add("m4a");
+            downloader.add("bestaudio[ext=m4a]");
             downloader.add("-o");
             downloader.add("");     //has to be set later, don't move from index 11
             downloader.add("--ppa");
             downloader.add("");     //has to be set later, don't move from index 13
+            downloader.add("--embed-thumbnail");
             downloader.add("--no-mtime");
 
             //conditional arguments

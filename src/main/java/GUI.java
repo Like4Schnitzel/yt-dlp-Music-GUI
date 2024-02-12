@@ -45,6 +45,7 @@ public class GUI {
     JFileChooser outputDirectoryChooser;
     JButton outputDirectoryChooserButton;
     JTextField outputDirectoryTextField;
+    JCheckBox toggleThumbnailCrop;
 
     public void setAllEnabled(boolean enabled) {
         linkLabel.setEnabled(enabled);
@@ -87,6 +88,8 @@ public class GUI {
 
         outputDirectoryChooserButton.setEnabled(enabled);
 
+        toggleThumbnailCrop.setEnabled(enabled);
+
         download.setEnabled(enabled);
     }
 
@@ -117,7 +120,6 @@ public class GUI {
         titleText = new JTextField();
         playlistStart = new JTextField();
         playlistEnd = new JTextField();
-        toggleTrackIndexKeeping = new JCheckBox();
         downloadChapterField = new JTextField();
         downloadStartStamp = new JTextField();
         downloadEndStamp = new JTextField();
@@ -134,6 +136,7 @@ public class GUI {
         yesPlaylist = new JRadioButton("Yes");
         noPlaylist = new JRadioButton("No");
         customPlaylist = new JRadioButton("From index");
+        toggleTrackIndexKeeping = new JCheckBox();
         downloadPlaylist = new ButtonGroup();
         downloadFull = new JRadioButton("Full video");
         downloadChapter = new JRadioButton("Chapter");
@@ -144,6 +147,7 @@ public class GUI {
         outputDirectoryChooser = new JFileChooser();
         outputDirectoryTextField = new JTextField();
         outputDirectoryChooserButton = new JButton("...");
+        toggleThumbnailCrop = new JCheckBox("Crop thumbnail");
         frame.setSize(frameWidth, frameHeight);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -318,6 +322,10 @@ public class GUI {
 
         outputDirectoryChooserButton.setBounds(outputDirectoryTextField.getX() + outputDirectoryTextField.getWidth(), outputDirectoryTextField.getY(), 20, 25);
         panel.add(outputDirectoryChooserButton);
+
+        toggleThumbnailCrop.setBounds(outputDirectoryChooserButton.getX() + outputDirectoryChooserButton.getWidth() + 40, outputDirectoryChooserButton.getY(), 150, 25);
+        toggleThumbnailCrop.setSelected(true);
+        panel.add(toggleThumbnailCrop);
 
         download.setBounds(frameWidth/2 - 150/2, outputDirectoryTextField.getY() + outputDirectoryTextField.getHeight() + 10, 150, 25);
 
