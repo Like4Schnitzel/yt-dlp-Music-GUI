@@ -74,7 +74,11 @@ public class Loader {
     public void setArtistListeners() {
         mainWindow.defaultArtist.addActionListener(e -> {
             mainWindow.artistText.setEnabled(false);
-            mainWindow.artistText.setText(artist);
+            if(!mainWindow.noPlaylist.isSelected()) {
+                mainWindow.artistText.setText("detect");
+            } else {
+                mainWindow.artistText.setText(artist);
+            }
         });
 
         mainWindow.customArtist.addActionListener(e -> {
@@ -279,9 +283,17 @@ public class Loader {
 
         if (mainWindow.noPlaylist.isSelected()) {
             updateSectionButtons();
-            mainWindow.titleText.setText(title);
+            if (!mainWindow.customTitle.isSelected())
+                mainWindow.titleText.setText(title);
+
+            if (!mainWindow.customArtist.isSelected())
+                mainWindow.artistText.setText(artist);
         } else {
-            //mainWindow.defaultTitle.setSelected(true);
+            if (mainWindow.defaultArtist.isSelected()) {
+                mainWindow.artistText.setEnabled(false);
+                mainWindow.artistText.setText("detect");
+            }
+
             if (mainWindow.defaultTitle.isSelected()) {
                 mainWindow.titleText.setEnabled(false);
                 mainWindow.titleText.setText("detect");
@@ -442,6 +454,10 @@ public class Loader {
                         "title",
                         "--print",
                         "track",
+                        "--print",
+                        "uploader",
+                        "--print",
+                        "artist",
                         "--playlist-start",
                         mainWindow.playlistStart.getText(),
                         "--playlist-end",
@@ -454,61 +470,80 @@ public class Loader {
                         BufferedReader stdInput = new BufferedReader(new InputStreamReader(getNames.getInputStream()));
 
                         String s;
-                        String currentArtist = mainWindow.artistText.getText();
+                        String currentArtist = mainWindow.artistText.getText(); // will stay the same if custom is selected
                         String currentAlbum;
                         String currentTitle = "";
                         for (int i = 0; (s = stdInput.readLine()) != null; i++) {
-                            if (i % 2 == 0) {
-                                if (mainWindow.customTitle.isSelected()) {
-                                    currentTitle = applyRegexToTitle(s, mainWindow.titleText.getText());
-                                } else {
-                                    currentTitle = s;
-                                }
-                            } else {
-                                if (mainWindow.singleAlbum.isSelected()) {
-                                    currentAlbum = currentTitle;
-                                } else {
-                                    currentAlbum = mainWindow.albumText.getText();
-                                }
-
-                                i = i / 2 + 1;
-                                mainWindow.downloadProgress.setValue((i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
-                                mainWindow.downloadProgress.setString("Preparing download for video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
-                                downloader[2] = Integer.toString(i + parseInt(mainWindow.playlistStart.getText()) - 1);
-                                downloader[4] = downloader[2];
-                                if (!s.equals("NA")) {
-                                    //download with track
+                            switch (i % 4) {
+                                // s is title
+                                case 0: {
                                     if (mainWindow.customTitle.isSelected()) {
                                         currentTitle = applyRegexToTitle(s, mainWindow.titleText.getText());
                                     } else {
                                         currentTitle = s;
                                     }
-                                    if (mainWindow.singleAlbum.isSelected()) {
-                                        currentAlbum = currentTitle;
-                                    }
+                                    break;
                                 }
 
-                                downloader[10] = outputDirectory + "/" + formatForFilename(currentArtist) + "/" + formatForFilename(currentAlbum) + "/" + formatForFilename(currentTitle) + ".%(ext)s";
-                                downloader[12] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
-
-                                try {
-                                    System.out.println("Downloading with command `" + String.join(" ", downloader) + "`");
-                                    Process downloading = downloadRuntime.exec(downloader);
-                                    BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
-
-                                    String s1;
-                                    while ((s1 = stdInput1.readLine()) != null) {
-                                        System.out.println(s1);
-                                        if (s1.length() > 15 && s1.startsWith("[download]") && s1.charAt(16) == '%') {
-                                            mainWindow.downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + (i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
-                                            mainWindow.downloadProgress.setString("Downloading video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
+                                // s is track
+                                case 1: {
+                                    if (!s.equals("NA")) {
+                                        if (mainWindow.customTitle.isSelected()) {
+                                            currentTitle = applyRegexToTitle(s, mainWindow.titleText.getText());
+                                        } else {
+                                            currentTitle = s;
                                         }
                                     }
-                                } catch (IOException ex) {
-                                    throw new RuntimeException(ex);
+                                    break;
                                 }
 
-                                i = i * 2 - 1;
+                                // s is uploader
+                                case 2: {
+                                    if (mainWindow.defaultArtist.isSelected())
+                                        currentArtist = s;
+                                    break;
+                                }
+
+                                // s is artist
+                                case 3: {
+                                    if (!s.equals("NA") && mainWindow.defaultArtist.isSelected()) {
+                                        currentArtist = s;
+                                    }
+
+                                    if (mainWindow.singleAlbum.isSelected()) {
+                                        currentAlbum = currentTitle;
+                                    } else {
+                                        currentAlbum = mainWindow.albumText.getText();
+                                    }
+                                    i = i / 4 + 1;
+                                    mainWindow.downloadProgress.setValue((i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
+                                    mainWindow.downloadProgress.setString("Preparing download for video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
+                                    downloader[2] = Integer.toString(i + parseInt(mainWindow.playlistStart.getText()) - 1);
+                                    downloader[4] = downloader[2];
+
+                                    downloader[10] = outputDirectory + "/" + formatForFilename(currentArtist) + "/" + formatForFilename(currentAlbum) + "/" + formatForFilename(currentTitle) + ".%(ext)s";
+                                    downloader[12] = "ffmpeg:-metadata artist=" + formatForPPA(currentArtist) + " -metadata album=" + formatForPPA(currentAlbum) + " -metadata title=" + formatForPPA(currentTitle);
+
+                                    try {
+                                        System.out.println("Downloading with command `" + String.join(" ", downloader) + "`");
+                                        Process downloading = downloadRuntime.exec(downloader);
+                                        BufferedReader stdInput1 = new BufferedReader(new InputStreamReader(downloading.getInputStream()));
+
+                                        String s1;
+                                        while ((s1 = stdInput1.readLine()) != null) {
+                                            System.out.println(s1);
+                                            if (s1.length() > 15 && s1.startsWith("[download]") && s1.charAt(16) == '%') {
+                                                mainWindow.downloadProgress.setValue((int) (Double.parseDouble(s1.substring(11, 16)) * 10) + (i + parseInt(mainWindow.playlistStart.getText()) - 1) * 1000);
+                                                mainWindow.downloadProgress.setString("Downloading video " + i + " of " + (parseInt(mainWindow.playlistEnd.getText()) - parseInt(mainWindow.playlistStart.getText()) + 1) + "...");
+                                            }
+                                        }
+                                    } catch (IOException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+
+                                    i = i * 4 - 1;
+                                    break;
+                                }
                             }
                         }
                     } catch (IOException ex) {
@@ -710,7 +745,6 @@ public class Loader {
 
             if (!title.equals("")) {
                 mainWindow.artistLabel.setEnabled(true);
-                mainWindow.artistText.setText(artist);
                 mainWindow.defaultArtist.setEnabled(true);
                 mainWindow.defaultArtist.setSelected(true);
                 mainWindow.customArtist.setEnabled(true);
@@ -737,6 +771,7 @@ public class Loader {
                 }
 
                 mainWindow.titleText.setText(isList ? "detect" : title);
+                mainWindow.artistText.setText(isList ? "detect" : artist);
                 //mainWindow.customTitle.setEnabled(!isList);
                 mainWindow.playlistLabel.setEnabled(isList);
                 mainWindow.yesPlaylist.setEnabled(isList);
