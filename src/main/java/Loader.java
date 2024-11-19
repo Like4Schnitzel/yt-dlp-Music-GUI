@@ -846,7 +846,8 @@ public class Loader {
             downloader.add("--no-playlist");
             downloader.add("--no-mtime");
             downloader.add("--format");
-            downloader.add("bestaudio[ext=m4a]");
+            downloader.add("bestaudio");
+            downloader.add("--extract-audio");
             downloader.add("-o");
             downloader.add(outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s");
             downloader.add("--ppa");
@@ -872,12 +873,13 @@ public class Loader {
             downloader.add("");     //has to be set later, don't move from index 4
             downloader.add("--add-metadata");
             downloader.add("--format");
-            downloader.add("bestaudio[ext=m4a]");
+            downloader.add("bestaudio");
             downloader.add("--no-mtime");
             downloader.add("-o");
             downloader.add("");     //has to be set later, don't move from index 10
             downloader.add("--ppa");
             downloader.add("");     //has to be set later, don't move from index 12
+            downloader.add("--extract-audio");
             
             //conditional arguments
             if (mainWindow.toggleTrackIndexKeeping.isSelected()) {
