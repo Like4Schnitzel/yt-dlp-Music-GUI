@@ -838,7 +838,12 @@ public class Loader {
     }
 
     //builds the download command
-    private String[] downloadCommandBuilder() {        
+    private String[] downloadCommandBuilder() {
+        String selectedFormat = mainWindow.fileFormatSelector.getSelectedItem().toString().strip();
+        if ("default (best audio)".equalsIgnoreCase(selectedFormat)) {
+            selectedFormat = "best";
+        }
+
         ArrayList<String> downloader = new ArrayList<String>();
         downloader.add(checker.configValues.get("yt-dlp-path"));
         if (!downloadAsPlaylist) {
@@ -847,7 +852,6 @@ public class Loader {
             downloader.add("--no-mtime");
             downloader.add("--format");
             downloader.add("bestaudio");
-            downloader.add("--extract-audio");
             downloader.add("-o");
             downloader.add(outputDirectory + "/" + formatForFilename(mainWindow.artistText.getText()) + "/" + formatForFilename(mainWindow.albumText.getText()) + "/" + formatForFilename(mainWindow.titleText.getText()) + ".%(ext)s");
             downloader.add("--ppa");
@@ -879,7 +883,6 @@ public class Loader {
             downloader.add("");     //has to be set later, don't move from index 10
             downloader.add("--ppa");
             downloader.add("");     //has to be set later, don't move from index 12
-            downloader.add("--extract-audio");
             
             //conditional arguments
             if (mainWindow.toggleTrackIndexKeeping.isSelected()) {
@@ -898,6 +901,9 @@ public class Loader {
         }
         downloader.add("--youtube-skip-dash-manifest");
         downloader.add("--embed-thumbnail");
+        downloader.add("--extract-audio");
+        downloader.add("--audio-format");
+        downloader.add(selectedFormat);
         downloader.add(mainWindow.linkText.getText());
         return downloader.toArray(new String[downloader.size()]);
     }

@@ -58,6 +58,7 @@ public class DependencyChecker {
             configValues.put("left-bound", "10");
             configValues.put("upper-bound", "20");
             configValues.put("line-distance", "25");
+            configValues.put("file-format-options", "default (best audio);opus;mp3;ogg;m4a");
             Scanner configReader = new Scanner(new File(currentDirectory + "/config.txt"));
             String configString = "";
             for (int i = 1; configReader.hasNextLine(); i++) {

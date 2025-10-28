@@ -50,13 +50,14 @@ You can create a file named `config.txt` in the same directory as the .jar file 
 variable-name=value
 ```
 Empty lines get ignored, lack of an equals sign will result in an error, causing the line to get ignored. Spaces before and after the sign will not be ignored.
-If the file could not be found or a variable that is used in the program hasn't been assigned in the file, it instead assumes it's default value. Below is a template of a `config.txt` file with all currently available variables and their default values.
+If the file could not be found or a variable that is used in the program hasn't been assigned in the file, it instead assumes its default value. Below is a template `config.txt` file with all currently available variables and their default values.
 ```
 ffmpeg-path=ffmpeg
 yt-dlp-path=yt-dlp
 
 delay-seconds=1
 replace-chars=<>:"/\|?*
+file-format-options=default (best audio);.opus;.mp3;.ogg;.m4a
 
 frame-width=620
 frame-height=350
@@ -76,6 +77,10 @@ Explanation as to what these variables do:
                       field possible.
     replace-chars     Specify characters in the file name to replace with underscores to deal with naming conventions.
                       If you put spaces inbetween the characters it will replace all spaces with underscores.
+    file-format-options A list of possible formats to convert to after downloading, separated by semicolons.
+                      If "default (best audio)" is selected, it lets yt-dlp automatically select the bestaudio format.
+                      Essentially no input validation is done here, it's your responsibility to check that all custom
+                      file formats are valid. If you want the crashes to be handled, submit a PR.
 ## GUI Options:
     frame-width       Specifies the width of the main window in pixels.
     frame-height      Specifies the height of the main window in pixels.

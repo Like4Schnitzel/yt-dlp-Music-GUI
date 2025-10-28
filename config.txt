@@ -3,6 +3,7 @@ yt-dlp-path=yt-dlp
 
 delay-seconds=1
 replace-chars=<>:"/\|?*
+file-format-options=default (best audio);opus;mp3;ogg;m4a
 
 frame-width=620
 frame-height=350

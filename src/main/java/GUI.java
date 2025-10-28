@@ -42,6 +42,7 @@ public class GUI {
     JTextField downloadChapterField;
     JTextField downloadStartStamp;
     JTextField downloadEndStamp;
+    JComboBox<String> fileFormatSelector;
     JFileChooser outputDirectoryChooser;
     JButton outputDirectoryChooserButton;
     JTextField outputDirectoryTextField;
@@ -100,6 +101,7 @@ public class GUI {
         int leftBound = Integer.parseInt(checker.configValues.get("left-bound"));
         int upperBound = Integer.parseInt(checker.configValues.get("upper-bound"));
         int lineDistance = Integer.parseInt(checker.configValues.get("line-distance"));
+        String[] fileFormatOptions = checker.configValues.get("file-format-options").split(";");
 
         frame = new JFrame();
         panel = new JPanel();
@@ -144,6 +146,7 @@ public class GUI {
         downloadSections = new ButtonGroup();
         download = new JButton("Download");
         downloadProgress = new JProgressBar();
+        fileFormatSelector = new JComboBox<>(fileFormatOptions);
         outputDirectoryChooser = new JFileChooser();
         outputDirectoryTextField = new JTextField();
         outputDirectoryChooserButton = new JButton("...");
@@ -319,6 +322,10 @@ public class GUI {
         outputDirectoryTextField.setBounds(frameWidth/2 - 20 - 200/2, downloadSectionLabel.getY() + downloadSectionLabel.getHeight() + lineDistance, 200, 25);
         outputDirectoryTextField.setEnabled(false);
         panel.add(outputDirectoryTextField);
+
+        fileFormatSelector.setBounds(outputDirectoryTextField.getX() - frameWidth/4, outputDirectoryTextField.getY(), 140, 25);
+        fileFormatSelector.setEnabled(true);
+        panel.add(fileFormatSelector);
 
         outputDirectoryChooserButton.setBounds(outputDirectoryTextField.getX() + outputDirectoryTextField.getWidth(), outputDirectoryTextField.getY(), 20, 25);
         panel.add(outputDirectoryChooserButton);
