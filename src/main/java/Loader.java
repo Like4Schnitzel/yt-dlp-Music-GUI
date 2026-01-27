@@ -899,7 +899,8 @@ public class Loader {
             downloader.add("--ffmpeg-location");
             downloader.add(checker.configValues.get("ffmpeg-path"));
         }
-        downloader.add("--youtube-skip-dash-manifest");
+        downloader.add("--extractor-args");
+        downloader.add("youtube:skip=dash");
         downloader.add("--embed-thumbnail");
         downloader.add("--extract-audio");
         downloader.add("--audio-format");
